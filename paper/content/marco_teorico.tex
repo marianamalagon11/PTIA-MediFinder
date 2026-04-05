@@ -22,6 +22,20 @@ Como consecuencia a ello, la deuda en primera instancia afecta gravemente la est
 
 Es válido mencionar que, dentro de este boletín, lo dicho es que la culpa no recae en el gobierno, sino que va directamente a las EPS, de sus decisiones, omisiones y su mala organización administrativa.
 
+\subsection{Reconocimiento Óptico de Caracteres (OCR)}
+
+El Reconocimiento Óptico de Caracteres (\textit{Optical Character Recognition}, OCR) es un conjunto de técnicas que permite \textbf{extraer texto desde imágenes}. En el contexto de \textit{MediFinder}, el OCR es especialmente relevante porque tanto las \textbf{cajas de medicamentos} como la \textbf{parte trasera del blíster} suelen incluir texto con información crítica (nombre, concentración, forma farmacéutica, laboratorio y en algunos casos registro).
+
+En términos generales, un sistema de OCR aplicado a fotografías tomadas por usuarios suele incluir:
+\begin{itemize}
+	\item \textbf{Preprocesamiento:} corrección de inclinación/rotación, aumento de contraste, reducción de ruido y recorte de regiones con texto.
+	\item \textbf{Detección de texto:} localizar regiones donde probablemente hay texto (por ejemplo, líneas o bloques).
+	\item \textbf{Reconocimiento:} convertir píxeles a caracteres para obtener una cadena de texto.
+	\item \textbf{Postprocesamiento:} limpieza y normalización del texto (tildes, mayúsculas, unidades como mg/mL, abreviaturas) y corrección de errores típicos (por ejemplo, confusiones entre ``O'' y ``0'').
+\end{itemize}
+
+En un MVP orientado al usuario, es una buena práctica incorporar una etapa de \textbf{verificación humana} (el usuario corrige el texto detectado) para disminuir los efectos de errores de OCR causados por baja iluminación, reflejos (comunes en blíster) o desenfoque.
+
 \subsection{Redes Neuronales Convolucionales (CNN)}
 
 Para poder definir las redes neuronales convolucionales, en primer lugar, toca dar paso a la definición y el funcionamiento de las redes neuronales en sí.
@@ -36,20 +50,20 @@ Es válido hacer la mención de la definición general de las redes neuronales d
 
 El funcionamiento de este tipo de redes neuronales es destacable en el área de imágenes, voz o audio, y se componen de tres tipos de capas (principalmente): capa convolucional, capa de agrupación y la capa totalmente conectada.
 
-La capa convolucional es la primera capa de una red convolucional. Si bien las capas convolucionales pueden ir seguidas de otras capas convolucionales o de capas de agrupación, la capa final es la capa totalmente conectada. Con cada capa, la CNN aumenta su complejidad, identificando mayores porciones de la imagen. Las primeras capas se centran en características simples, como colores y bordes. A medida que los datos de la imagen avanzan a través de las capas, la CNN comienza a reconocer elementos o formas más grandes hasta que finalmente identifica el objeto esperado.
+En \textit{MediFinder}, la CNN se contempla principalmente como un \textbf{mecanismo de respaldo} (fallback) en los casos donde el OCR falle (por ejemplo, texto ilegible por reflejos en el blíster). En ese escenario, la CNN puede extraer un \textbf{embedding visual} del empaque para recuperar candidatos cercanos por similitud y luego cruzarlos con metadata del catálogo.
 
 \subsection{K-Nearest Neighbors (KNN)}
 
-Por otro lado, la IA que se adaptará ante la problemática descrita no solo se basará en una clasificación utilizando la CNN, sino que una parte del modelo utilizará este algoritmo, usado actualmente para Machine Learning.
+Por otro lado, el enfoque del proyecto no se basa únicamente en extraer texto (OCR), sino también en recomendar alternativas. Para esto, se usa el algoritmo \textit{k-nearest neighbors} (KNN) como método de \textbf{búsqueda por similitud} dentro de un catálogo de medicamentos, aprovechando atributos como principio activo principal, concentración, forma farmacéutica o representaciones vectoriales (embeddings).
 
 En su definición, el algoritmo de k-nearest neighbors (KNN) es un clasificador de aprendizaje supervisado no paramétrico, que emplea la proximidad para realizar clasificaciones o predicciones sobre la agrupación de un punto de datos individual. Hoy en día, es uno de los clasificadores de clasificación y regresión más sonados además de sencillos de implementar.
-
-El uso principal del algoritmo KNN es de clasificación, en donde se basa o parte del supuesto de que se pueden encontrar puntos similares cercanos uno del otro. Tipo como si fuera un grafo, los dos hijos del padre.
 
 Ante la explicación precisa del funcionamiento del supuesto de que hay puntos similares cercanos, dentro de la página de IBM:
 
 \begin{quote}
 	En los problemas de clasificación, la etiqueta de clase se asigna por mayoría de votos, es decir, se emplea la etiqueta que se representa con más frecuencia en torno a un punto de datos determinado. Aunque técnicamente se considera ``votación por pluralidad'', el término ``votación por mayoría'' se emplea más comúnmente en las publicaciones al respecto. La distinción entre estas terminologías es que la ``votación por mayoría'' requiere técnicamente una mayoría superior al 50\%, lo que funciona sobre todo cuando sólo hay dos categorías. Cuando hay varias clases, por ejemplo, cuatro categorías, usted no requiere necesariamente el 50\% de los votos para llegar a una conclusión sobre una clase, ya que podría asignar una etiqueta de clase con un voto superior al 25\%. \cite{ibm2025knn}
 \end{quote}
+
+En \textit{MediFinder}, KNN se utiliza para \textbf{rankear alternativas} y proponer medicamentos similares, priorizando aquellos que comparten el \textbf{principio activo principal} (misma molécula). Como segundo nivel informativo (cuando el catálogo no ofrece suficientes equivalentes), se pueden mostrar alternativas de la misma \textbf{clase terapéutica} con advertencias, ya que no necesariamente son intercambiables.
 
 \pagebreak

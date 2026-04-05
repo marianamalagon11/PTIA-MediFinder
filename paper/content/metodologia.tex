@@ -1,0 +1,53 @@
+\section{Enfoque metodológico y técnico}
+\label{sec:metodologia}
+
+El proyecto adopta un enfoque de prototipado incremental orientado a un \textbf{MVP funcional} con alcance en Colombia. La meta es entregar un flujo completo y evaluable: desde una fotografía del empaque hasta una lista de alternativas por principio activo, con información básica del medicamento.
+
+\subsection{Decisiones metodológicas (por qué este enfoque)}
+\begin{itemize}
+	\item \textbf{OCR como núcleo de identificación:} para cajas y blísteres, el texto (nombre, concentración, forma) es la señal más informativa y estable. Por ello, el MVP prioriza OCR y verificación manual.
+	\item \textbf{KNN como motor de recomendación:} dado un medicamento identificado y su principio activo, se utiliza KNN (sobre atributos/representaciones del catálogo) para ordenar alternativas y recuperar equivalentes.
+	\item \textbf{Fuentes oficiales en Colombia:} el sistema se apoya en INVIMA y \textit{Medicamentos a un Clic} como fuentes principales de consulta y validación de información \cite{invima_registros,medicamentosaunclic}.
+\end{itemize}
+
+\subsection{Pipeline técnico del MVP}
+El MVP se compone de los siguientes módulos:
+
+\subsubsection{Módulo 1: Ingesta de imagen}
+\begin{itemize}
+	\item Entrada: foto de caja o parte trasera del blíster.
+	\item Preprocesamiento: rotación, contraste, reducción de ruido, y recorte cuando aplique.
+\end{itemize}
+
+\subsubsection{Módulo 2: OCR + normalización + mapeo a medicamento}
+\begin{itemize}
+	\item OCR extrae texto del empaque/blíster.
+	\item El usuario confirma/corrige campos críticos (minimiza fallos por OCR).
+	\item Normalización: limpieza de texto, unidades, tildes, variantes.
+	\item Mapeo: vincular el texto a un registro del catálogo (por ejemplo mediante similitud de strings y claves).
+\end{itemize}
+
+\subsubsection{Módulo 3: Enriquecimiento + recomendaciones por principio activo (KNN)}
+\begin{itemize}
+	\item Se consulta la metadata del medicamento: principio activo principal, concentración, forma y función (tipo y usos).
+	\item Se generan alternativas:
+	\begin{itemize}
+		\item \textbf{Equivalentes por molécula}: misma molécula (principio activo principal), idealmente misma concentración/forma.
+		\item \textbf{Similares por clase}: alternativa secundaria informativa cuando no existan equivalentes suficientes.
+	\end{itemize}
+	\item El ranking final se obtiene con KNN y reglas de filtro por principio activo y forma farmacéutica.
+\end{itemize}
+
+\subsection{Evaluación (qué se medirá)}
+Para evaluar el prototipo, se medirán:
+
+\begin{itemize}
+	\item \textbf{Calidad de OCR/mapeo:} tasa de acierto del nombre detectado (antes y después de corrección del usuario) y porcentaje de casos que se mapean correctamente a un registro del catálogo.
+	\item \textbf{Calidad de recomendación:} proporción de alternativas que coinciden en principio activo (Nivel 1) y coherencia en forma/concentración cuando exista esa información.
+	\item \textbf{Tiempo de respuesta:} tiempo total desde captura hasta resultados (OCR + consulta + KNN).
+\end{itemize}
+
+\subsection{Extensión prevista (CNN como respaldo)}
+Como línea de mejora, se considera integrar una CNN como respaldo cuando el texto sea ilegible (borroso, reflejos, baja luz), permitiendo extraer un embedding visual del empaque para recuperar candidatos probables y luego aplicar las mismas reglas de enriquecimiento y recomendación. Esta extensión no es requerida para el MVP, pero se deja documentada como escalabilidad técnica.
+
+\pagebreak

@@ -1,30 +1,58 @@
 \section{Propuesta de solución}
 
-Reuniendo todo lo mencionado ante la problemática presente en la sociedad colombiana, que de paso no será algo que se solucione en el corto plazo y el país necesita una solución al menos temporal mientras todo retoma su ``curso normal''.
+Reuniendo todo lo mencionado ante la problemática presente en la sociedad colombiana, que no se solucionará en el corto plazo, se propone una solución tecnológica \textit{temporal} que ayude a los pacientes a identificar un medicamento y encontrar alternativas cuando el fármaco original no esté disponible.
 
-La solución planteada es implementar un modelo IA que tenga un aprendizaje automatizado supervisado (CNN) y no supervisado (KNN), el cual se entrenará previamente con la mayor cantidad de datos que logremos conseguir, en donde el paciente sube la foto de un medicamento, bajo un contexto que fue un medicamento que utilizó previamente más ahora que lo volvió a buscar se dio cuenta que ya se le acabó, entonces, el modelo se encargará de darle al paciente/persona información sobre ese medicamento (su tipo, si es analgésico, antibiótico o antiinflamatorio, y de paso información como tal del medicamento). De igual manera, se le dará al paciente recomendaciones del fármaco que colocó, sea que tenga el mismo componente a que tenga un componente parecido, pero que, de todas formas, le funcione a la persona para que lo pueda conseguir en caso de que el que tenía que se le agotó, se le complique conseguirlo.
+La solución planteada es implementar un sistema de IA que, a partir de una fotografía del medicamento (idealmente la \textbf{caja} o la \textbf{parte trasera del blíster}), permita: (i) reconocer el medicamento mediante extracción y verificación de texto (OCR) y (ii) recomendar alternativas farmacéuticas con base en el \textbf{principio activo principal}. El MVP se apoya en fuentes colombianas (INVIMA y \textit{Medicamentos a un Clic}) y en un motor de similitud basado en KNN.
 
-\subsection{Arquitectura del sistema}
+\subsection{Prototipo de interfaz (wireframe de papel)}
 
-Mediante el conocimiento que tenemos sobre implementar modelos IA en código, inicialmente vamos a empezar a implementar todo con las librerías Scikit-learn + TensorFlow/PyTorch en Python, para no tener que definir todo desde cero. Igualmente, en caso de que sea necesario implementarlo desde cero, se hará definiendo todas las funciones básicas para que el modelo funcione de manera correcta.
+La Figura~\ref{fig:prototipo_papel} ilustra el prototipo conceptual del sistema, que define el flujo mínimo de interacción: captura/subida de imagen, verificación de texto detectado (OCR) y presentación de información y alternativas.
 
-Tener en cuenta que toca tener metadata asociada, pero toda la búsqueda de similitud es trabajo 100\% de ML, en donde:
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.97\textwidth]{img/prototipoPapel.png}
+	\caption{Prototipo de papel (wireframe) del MVP de MediFinder: captura/subida, extracción y verificación (OCR) y resultados con función del medicamento y alternativas (KNN por principio activo).}
+	\label{fig:prototipo_papel}
+\end{figure}
 
-\subsubsection{Durante entrenamiento}
+\subsection{Arquitectura del sistema (MVP)}
 
+El MVP se organiza como un pipeline en tres pasos, alineado con el flujo del prototipo:
+
+\subsubsection{Paso 1: Captura de imagen y preprocesamiento}
 \begin{itemize}
-	\item Guardas los embeddings de todos los medicamentos del training set
-	\item Guardas metadata asociada (nombre, componente, usos)
+	\item El usuario toma o sube una imagen de la \textbf{caja del medicamento} o la \textbf{parte trasera del blíster}.
+	\item Se aplica preprocesamiento para mejorar la legibilidad: corrección de rotación, ajuste de contraste y normalización del tamaño.
+	\item Se muestran recomendaciones de captura (buena luz, enfoque y sin reflejos) para reducir errores.
 \end{itemize}
 
-\subsubsection{Durante inferencia}
-
+\subsubsection{Paso 2: Extracción y verificación de texto (OCR + normalización)}
 \begin{itemize}
-	\item CNN extrae embedding del medicamento nuevo
-	\item KNN busca en el espacio de embeddings (no en una BD tradicional)
-	\item KNN retorna los K vecinos + su metadata
+	\item Se aplica OCR para extraer texto relevante del empaque/blíster (principalmente el \textbf{nombre del medicamento} y, cuando sea posible, concentración y forma farmacéutica).
+	\item El sistema presenta los campos detectados de forma \textbf{editable} para que el usuario corrija errores frecuentes del OCR.
+	\item Se normaliza el texto (tildes, mayúsculas/minúsculas, abreviaturas, unidades) y se realiza un proceso de \textit{matching} para mapear el texto a un registro del catálogo.
 \end{itemize}
 
-La clave está en que el KNN trabaja en el espacio latente aprendido por la CNN, no en una base de datos relacional.
+\subsubsection{Paso 3: Consulta de información y recomendación de alternativas (KNN)}
+Una vez identificado el medicamento, el sistema:
+\begin{itemize}
+	\item consulta la información disponible en fuentes colombianas y el catálogo consolidado del proyecto;
+	\item muestra la \textbf{función del medicamento} (tipo terapéutico y usos/indicaciones generales);
+	\item calcula \textbf{alternativas similares} por \textbf{principio activo principal} usando KNN:
+	\begin{itemize}
+		\item \textbf{Prioridad 1 (equivalentes):} misma molécula (mismo principio activo principal) y, de ser posible, misma concentración y forma farmacéutica.
+		\item \textbf{Prioridad 2 (similares por clase):} misma clase terapéutica cuando no existan suficientes equivalentes por molécula (se presenta como sugerencia informativa).
+	\end{itemize}
+\end{itemize}
+
+\subsection{Fuentes de datos (Colombia) e integración}
+
+El MVP se apoya en fuentes y plataformas con información relevante para Colombia:
+\begin{itemize}
+	\item \textbf{INVIMA} (listado de registros sanitarios de medicamentos) \cite{invima_registros}.
+	\item \textbf{Medicamentos a un Clic} (consulta de información de medicamentos autorizados y regulados) \cite{medicamentosaunclic}.
+\end{itemize}
+
+En el prototipo, la información se consolida en un catálogo mínimo (por ejemplo CSV/JSON) para: (i) mapear el medicamento detectado a su principio activo principal y (ii) habilitar el ranking de alternativas por similitud.
 
 \pagebreak

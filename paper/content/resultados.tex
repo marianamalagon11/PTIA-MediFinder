@@ -1,5 +1,48 @@
 \section{Análisis de resultados}
 
-\textit{Todavía no hecho - Esta sección se completará una vez se obtengan los resultados experimentales del modelo implementado.}
+Esta sección describe cómo se evaluará el MVP de MediFinder, el cual identifica el medicamento desde una fotografía mediante OCR (con verificación del usuario) y recomienda alternativas priorizando equivalencia por \textbf{principio activo principal}, usando un ranking basado en KNN y reglas de filtrado.
+
+\subsection{Escenarios de prueba}
+
+Para reflejar el uso real del sistema, las pruebas consideran dos tipos de entrada:
+\begin{itemize}
+	\item \textbf{Caja del medicamento:} suele contener el nombre de forma legible y ofrece mejores resultados de OCR.
+	\item \textbf{Parte trasera del blíster:} puede presentar reflejos y texto grabado; se espera mayor tasa de error, por lo que la verificación manual es clave.
+\end{itemize}
+
+Adicionalmente, se contemplan variaciones de iluminación, ángulo de captura y resolución.
+
+\subsection{Métricas para OCR y mapeo al catálogo}
+
+El objetivo de esta etapa es que el sistema pueda mapear correctamente el texto detectado (nombre del medicamento y, cuando aplique, concentración/forma) a un registro del catálogo.
+
+\begin{itemize}
+	\item \textbf{Exactitud del texto detectado (OCR):} porcentaje de casos donde el nombre detectado coincide con el nombre real (antes de corrección).
+	\item \textbf{Exactitud después de verificación:} porcentaje de casos donde, tras corrección del usuario, el sistema logra mapear al registro correcto.
+	\item \textbf{Tasa de mapeo exitoso:} proporción de imágenes donde se identifica un medicamento en el catálogo (cobertura efectiva del MVP).
+\end{itemize}
+
+\subsection{Métricas para recomendación de alternativas (KNN)}
+
+El objetivo de recomendación es entregar alternativas útiles y seguras, priorizando equivalencia por molécula.
+
+\begin{itemize}
+	\item \textbf{Precisión por principio activo (Nivel 1):} porcentaje de recomendaciones Top-$K$ que comparten el \textbf{principio activo principal} con el medicamento consultado.
+	\item \textbf{Consistencia de presentación:} porcentaje de recomendaciones que mantienen forma farmacéutica comparable (por ejemplo, tableta con tableta) cuando exista la información.
+	\item \textbf{Cobertura de alternativas:} número de alternativas disponibles por medicamento (depende del tamaño del catálogo y metadata).
+\end{itemize}
+
+\subsection{Resultados esperados y análisis de errores}
+
+Se espera que el MVP funcione mejor con imágenes de \textbf{caja} que con imágenes del \textbf{blíster}, debido a diferencias en legibilidad y reflejos. Los errores más probables a documentar son:
+
+\begin{itemize}
+	\item errores de OCR por baja iluminación o desenfoque;
+	\item confusiones entre nombres similares o abreviaturas;
+	\item ausencia de medicamento en el catálogo (limitación de cobertura);
+	\item recomendaciones limitadas si faltan datos de principio activo o concentración.
+\end{itemize}
+
+El análisis de estos errores orientará iteraciones posteriores, como mejorar preprocesamiento, ampliar catálogo y enriquecer metadata para mayor precisión en equivalencias.
 
 \pagebreak
