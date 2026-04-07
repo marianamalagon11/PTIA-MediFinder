@@ -4,7 +4,7 @@ Reuniendo todo lo mencionado ante la problemática presente en la sociedad colom
 
 La solución planteada es implementar un sistema de IA que, a partir de una fotografía del medicamento (idealmente la \textbf{caja} o la \textbf{parte trasera del blíster}), permita: (i) reconocer el medicamento mediante extracción y verificación de texto (OCR) y (ii) recomendar alternativas farmacéuticas con base en el \textbf{principio activo principal}. El MVP se apoya en fuentes colombianas (INVIMA y \textit{Medicamentos a un Clic}) y en un motor de similitud basado en KNN.
 
-\subsection{Prototipo de interfaz (wireframe de papel)}
+\subsection{Prototipo de papel}
 
 La Figura~\ref{fig:prototipo_papel} ilustra el prototipo conceptual del sistema, que define el flujo mínimo de interacción: captura/subida de imagen, verificación de texto detectado (OCR) y presentación de información y alternativas.
 
@@ -13,6 +13,36 @@ La Figura~\ref{fig:prototipo_papel} ilustra el prototipo conceptual del sistema,
 	\includegraphics[width=0.97\textwidth]{img/prototipoPapel.png}
 	\caption{Prototipo de papel (wireframe) del MVP de MediFinder: captura/subida, extracción y verificación (OCR) y resultados con función del medicamento y alternativas (KNN por principio activo).}
 	\label{fig:prototipo_papel}
+\end{figure}
+
+\subsection{Prototipo de interfaz}
+
+Además del wireframe en papel, se desarrolló un prototipo de interfaz digital para validar la experiencia de usuario y la navegación del MVP.
+
+\begin{itemize}
+	\item \textbf{Link de figma:} \href{https://city-wasp-51690509.figma.site/}{https://city-wasp-51690509.figma.site/}
+	\item \textbf{Link Video demo:} \href{https://youtu.be/q5UDXb44g08}{https://youtu.be/q5UDXb44g08}
+\end{itemize}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/prot1.png}
+	\caption{Pantalla 1 del prototipo de interfaz de MediFinder.}
+	\label{fig:prototipo_interfaz_1}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/prot2.png}
+	\caption{Pantalla 2 del prototipo de interfaz de MediFinder.}
+	\label{fig:prototipo_interfaz_2}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.9\textwidth]{img/prot3.png}
+	\caption{Pantalla 3 del prototipo de interfaz de MediFinder.}
+	\label{fig:prototipo_interfaz_3}
 \end{figure}
 
 \subsection{Arquitectura del sistema (MVP)}
