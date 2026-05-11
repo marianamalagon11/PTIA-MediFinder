@@ -10,7 +10,7 @@ python-dotenv==1.0.1
 anthropic==0.28.0
 
 # Embeddings / Vector DB
-chromadb==0.5.3
+chromadb==0.6.3
 sentence-transformers==3.0.1
 
 # CNN (EfficientNet feature extractor) — versiones compatibles con Python 3.13

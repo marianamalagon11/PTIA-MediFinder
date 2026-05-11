@@ -7,6 +7,8 @@ import numpy as np
 import pytesseract
 from PIL import Image
 
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
 
 def _preprocesar(imagen: np.ndarray) -> np.ndarray:
     gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)

@@ -1,7 +1,6 @@
 import asyncio
 import csv
 import json
-import os
 import re
 from pathlib import Path
 
@@ -15,14 +14,14 @@ OUTPUT_DIR    = Path("app/data/raw_images")
 MANIFEST_PATH = Path("app/data/scrape_manifest.json")
 CSV_MEDS      = Path("app/data/medicamentos_detallado.csv")
 
-DELAY             = 1.5
+DELAY             = 1.0
 MAX_POR_CATEGORIA = 60
 TIMEOUT_MS        = 60000
-DEBUG_HEADLESS    = False  # False = navegador visible para depurar
+DEBUG_HEADLESS    = False
 
 FARMATODO_CATEGORIAS = [
-    "https://www.farmatodo.com.co/categorias/salud-y-medicamentos/tratamiento-de-la-gripa",
     "https://www.farmatodo.com.co/categorias/salud-y-medicamentos/alivio-del-dolor",
+    "https://www.farmatodo.com.co/categorias/salud-y-medicamentos/tratamiento-de-la-gripa",
     "https://www.farmatodo.com.co/categorias/salud-y-medicamentos/salud-digestiva",
     "https://www.farmatodo.com.co/categorias/salud-y-medicamentos/dermatologicos",
 ]
@@ -35,26 +34,9 @@ CRUZVERDE_CATEGORIAS = [
     "https://www.cruzverde.com.co/medicamentos/sistema-respiratorio/",
 ]
 
-# ─── SELECTORES ───────────────────────────────────────────────────────────────
-# Farmatodo: confirmados por debug — usa clases propias (no VTEX)
-FARMATODO_SEL = {
-    "card":    "[class*='card-ftd'][class*='add-information']",
-    "nombre":  "[class*='name'], [class*='title'], p[class*='description'], a[class*='product']",
-    "imagen":  "[class*='picture-wrapper'] img, [class*='product-image'] img, img[class*='image']",
-    "ver_mas": "[class*='ver-mas'], button[class*='more'], [class*='load-more'], [class*='siguiente']",
-}
-
-# Cruz Verde: Angular + Tailwind — actualizar tras inspección con debug_card
-CRUZVERDE_SEL = {
-    "card":    "[class*='product-card'], [class*='productCard'], app-product-card, "
-               "[class*='product-item'], [class*='item-product']",
-    "nombre":  "[class*='product-name'], [class*='productName'], [class*='name'], "
-               "h2, h3, p[class*='title'], span[class*='name']",
-    "imagen":  "img[class*='product'], [class*='product-image'] img, "
-               "[class*='img-product'] img, figure img, img",
-    "ver_mas": "button[class*='load-more'], [class*='loadMore'], [class*='ver-mas'], "
-               "button[class*='more'], [class*='siguiente']",
-}
+# Palabras que indican texto promocional (no es nombre de producto)
+_PROMOS = ["primera compra", "domicilio", "aprovecha", "prime", "descuento",
+           "oferta", "envío", "gratis", "puntos", "app y web", "solo hoy"]
 
 
 # ─── CSV ──────────────────────────────────────────────────────────────────────
@@ -77,7 +59,7 @@ def cargar_mapeo_csv() -> dict[str, str]:
         col_nom = next((c for c in posibles_col_nombre if c in cols), None)
         col_pa  = next((c for c in posibles_col_pa if c in cols), None)
         if not col_nom or not col_pa:
-            print(f"[AVISO] Columnas: {cols}")
+            print(f"[AVISO] Columnas disponibles: {cols}")
             return mapeo
         print(f"[CSV] Usando columnas: nombre='{col_nom}' | principio_activo='{col_pa}'")
         for row in reader:
@@ -121,42 +103,94 @@ def nombre_archivo_seguro(texto: str) -> str:
     return re.sub(r"[^a-z0-9_-]", "_", texto.lower().strip())[:80]
 
 
-# ─── DEBUG ────────────────────────────────────────────────────────────────────
-
-async def debug_clases_pagina(page, sitio: str):
-    print(f"\n  [DEBUG {sitio}] Clases con palabras clave de producto:")
-    try:
-        clases = await page.evaluate("""() => {
-            const kw = ['product', 'card', 'item', 'shelf', 'catalog', 'ftd'];
-            const encontrados = new Set();
-            document.querySelectorAll('*[class]').forEach(el => {
-                const cls = (el.className || '').toString();
-                if (kw.some(k => cls.toLowerCase().includes(k)))
-                    encontrados.add(cls.split(' ').slice(0,4).join(' '));
-            });
-            return Array.from(encontrados).slice(0, 20);
-        }""")
-        for c in clases:
-            print(f"    → {c}")
-    except Exception as e:
-        print(f"  [DEBUG] Error: {e}")
+def es_promo(texto: str) -> bool:
+    txt = texto.lower()
+    return any(p in txt for p in _PROMOS) or txt.startswith("%") or "%" in txt[:5]
 
 
-async def debug_primera_card(page, selector_card: str, sitio: str):
-    """Inspecciona la primera tarjeta encontrada para ver su HTML interno."""
-    print(f"\n  [DEBUG {sitio}] Inspeccionando primera card con selector '{selector_card}':")
-    try:
-        cards = await page.query_selector_all(selector_card)
-        if not cards:
-            print("  [DEBUG] Ninguna card encontrada con ese selector.")
-            return
-        print(f"  [DEBUG] {len(cards)} cards encontradas.")
-        html = await cards[0].inner_html()
-        # Mostrar solo las primeras 800 chars para no saturar el log
-        print(f"  [DEBUG] HTML de la primera card (primeros 800 chars):")
-        print(f"  {html[:800]}")
-    except Exception as e:
-        print(f"  [DEBUG] Error: {e}")
+# ─── EXTRACCIÓN JS (evita context destruction de Angular) ─────────────────────
+
+_JS_FARMATODO = """() => {
+    const cards = document.querySelectorAll('[class*="card-ftd"][class*="add-information"]');
+    const promos = ["primera compra", "domicilio", "aprovecha", "prime",
+                    "descuento", "oferta", "envío", "gratis", "app y web"];
+    const resultados = [];
+
+    cards.forEach(card => {
+        // Imagen: buscar img real (no SVG, no iconos)
+        let imgSrc = '';
+        for (const img of card.querySelectorAll('img')) {
+            const src = img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy') || '';
+            if (src && !src.includes('.svg') && !src.includes('icon') &&
+                !src.includes('logo') && src.startsWith('http')) {
+                imgSrc = src;
+                break;
+            }
+        }
+
+        // Nombre: texto más largo sin contenido promocional
+        let nombre = '';
+        let maxLen = 0;
+        for (const el of card.querySelectorAll('p, span, h1, h2, h3, h4, a')) {
+            const txt = (el.textContent || '').trim();
+            const esPromo = promos.some(p => txt.toLowerCase().includes(p)) ||
+                            txt.startsWith('%') || /^\\d+%/.test(txt);
+            if (!esPromo && txt.length > maxLen && txt.length >= 5 && txt.length < 150) {
+                nombre = txt;
+                maxLen = txt.length;
+            }
+        }
+
+        if (imgSrc) {
+            resultados.push({ nombre: nombre.trim(), img_src: imgSrc });
+        }
+    });
+
+    return resultados;
+}"""
+
+_JS_CRUZVERDE = """() => {
+    // Cruz Verde usa Tailwind sin clases semánticas.
+    // Los productos están en un grid: [class*='grid-cols-6'] o [class*='grid-cols-2']
+    const grid = document.querySelector('[class*="grid-cols-6"], [class*="grid-cols-4"], [class*="grid-cols-3"]');
+    if (!grid) return { error: 'No se encontró grid de productos', cards: [] };
+
+    const promos = ["primera compra", "domicilio", "aprovecha", "descuento",
+                    "oferta", "envío", "gratis", "app y web"];
+    const resultados = [];
+
+    Array.from(grid.children).forEach(card => {
+        // Imagen real del producto
+        let imgSrc = '';
+        for (const img of card.querySelectorAll('img')) {
+            const src = img.src || img.getAttribute('data-src') || '';
+            if (src && !src.includes('.svg') && !src.includes('icon') &&
+                !src.includes('logo') && src.startsWith('http')) {
+                imgSrc = src;
+                break;
+            }
+        }
+
+        // Nombre del producto
+        let nombre = '';
+        let maxLen = 0;
+        for (const el of card.querySelectorAll('p, span, h1, h2, h3, a')) {
+            const txt = (el.textContent || '').trim();
+            const esPromo = promos.some(p => txt.toLowerCase().includes(p)) ||
+                            /^\\d+%/.test(txt);
+            if (!esPromo && txt.length > maxLen && txt.length >= 5 && txt.length < 150) {
+                nombre = txt;
+                maxLen = txt.length;
+            }
+        }
+
+        if (imgSrc) {
+            resultados.push({ nombre: nombre.trim(), img_src: imgSrc });
+        }
+    });
+
+    return { cards: resultados, total_hijos: grid.children.length };
+}"""
 
 
 # ─── SCRAPER FARMATODO ────────────────────────────────────────────────────────
@@ -170,172 +204,78 @@ async def scrapear_farmatodo(page, categoria_url: str, mapeo: dict, manifest: li
         print(f"  [ERROR] No se pudo cargar: {e}")
         return
 
-    productos_encontrados = 0
+    productos_descargados = 0
 
     for intento in range(5):
-        cards = await page.query_selector_all(FARMATODO_SEL["card"])
-
-        if not cards:
-            if intento == 0:
-                await debug_clases_pagina(page, "FARMATODO")
-            print("  [AVISO] No se encontraron tarjetas. Revisá FARMATODO_SEL['card'].")
-            break
-
-        if intento == 0:
-            print(f"  ✔ {len(cards)} tarjetas encontradas con selector card.")
-            # Debug: ver qué hay dentro de la primera card para ajustar nombre/imagen
-            await debug_primera_card(page, FARMATODO_SEL["card"], "FARMATODO")
-
-        for card in cards[productos_encontrados:MAX_POR_CATEGORIA]:
-            try:
-                el_nombre = await card.query_selector(FARMATODO_SEL["nombre"])
-                el_imagen = await card.query_selector(FARMATODO_SEL["imagen"])
-
-                if not el_nombre or not el_imagen:
-                    continue
-
-                nombre  = (await el_nombre.inner_text()).strip()
-                img_url = (
-                    await el_imagen.get_attribute("src") or
-                    await el_imagen.get_attribute("data-src") or
-                    await el_imagen.get_attribute("data-lazy")
-                )
-
-                if not img_url or not nombre:
-                    continue
-
-                if img_url.startswith("//"):
-                    img_url = "https:" + img_url
-
-                pa        = encontrar_principio_activo(nombre, mapeo)
-                safe_nom  = nombre_archivo_seguro(nombre)
-                safe_pa   = nombre_archivo_seguro(pa)
-                extension = img_url.split("?")[0].split(".")[-1]
-                if extension not in ("jpg", "jpeg", "png", "webp"):
-                    extension = "jpg"
-
-                destino = OUTPUT_DIR / safe_pa / f"farmatodo_{safe_nom}.{extension}"
-                ok = await descargar_imagen(img_url, destino)
-
-                if ok:
-                    print(f"  ✓ {nombre[:50]} → {pa}")
-                    manifest.append({
-                        "fuente": "farmatodo",
-                        "nombre": nombre,
-                        "principio_activo": pa,
-                        "imagen_path": str(destino),
-                        "url_imagen": img_url,
-                        "categoria": categoria_url,
-                    })
-                    productos_encontrados += 1
-
-                await asyncio.sleep(DELAY)
-
-            except Exception as e:
-                print(f"  [ERROR card] {e}")
-                continue
-
-            if productos_encontrados >= MAX_POR_CATEGORIA:
-                break
-
-        if productos_encontrados >= MAX_POR_CATEGORIA:
-            break
-
-        btn = await page.query_selector(FARMATODO_SEL["ver_mas"])
-        if not btn:
-            break
+        # Extraer TODOS los datos de una vez con JS (evita context destruction)
         try:
-            await btn.click()
-            await page.wait_for_timeout(2500)
-        except Exception:
+            datos = await page.evaluate(_JS_FARMATODO)
+        except Exception as e:
+            print(f"  [ERROR JS] {e}")
             break
 
-    print(f"  Total descargados: {productos_encontrados}")
-
-
-# ─── SCRAPER CRUZ VERDE ───────────────────────────────────────────────────────
-
-async def scrapear_cruzverde(page, categoria_url: str, mapeo: dict, manifest: list):
-    print(f"\n[CRUZ VERDE] {categoria_url}")
-    try:
-        await page.goto(categoria_url, wait_until="domcontentloaded", timeout=TIMEOUT_MS)
-        # Cruz Verde es Angular → esperar más tiempo para que renderice
-        await page.wait_for_timeout(5000)
-    except Exception as e:
-        print(f"  [ERROR] No se pudo cargar: {e}")
-        return
-
-    productos_encontrados = 0
-
-    for intento in range(5):
-        cards = await page.query_selector_all(CRUZVERDE_SEL["card"])
-
-        if not cards:
+        if not datos:
+            print(f"  [AVISO] JS no encontró productos (intento {intento + 1}).")
             if intento == 0:
-                await debug_clases_pagina(page, "CRUZ VERDE")
-                print("  [AVISO] No se encontraron tarjetas. Revisá CRUZVERDE_SEL['card'].")
-            break
-
-        if intento == 0:
-            print(f"  ✔ {len(cards)} tarjetas encontradas.")
-            await debug_primera_card(page, CRUZVERDE_SEL["card"], "CRUZ VERDE")
-
-        for card in cards[productos_encontrados:MAX_POR_CATEGORIA]:
-            try:
-                el_nombre = await card.query_selector(CRUZVERDE_SEL["nombre"])
-                el_imagen = await card.query_selector(CRUZVERDE_SEL["imagen"])
-
-                if not el_nombre or not el_imagen:
-                    continue
-
-                nombre  = (await el_nombre.inner_text()).strip()
-                img_url = (
-                    await el_imagen.get_attribute("src") or
-                    await el_imagen.get_attribute("data-src") or
-                    await el_imagen.get_attribute("data-lazy-src")
+                # Debug: mostrar cuántos card-ftd hay sin el filtro add-information
+                total_cards = await page.evaluate(
+                    "() => document.querySelectorAll('[class*=\"card-ftd\"]').length"
                 )
+                print(f"  [DEBUG] Total elementos con 'card-ftd' (sin filtro): {total_cards}")
+                imgs_page = await page.evaluate(
+                    "() => Array.from(document.querySelectorAll('img')).slice(0,5).map(i => i.src)"
+                )
+                print(f"  [DEBUG] Primeras 5 imágenes en página: {imgs_page}")
+            await page.wait_for_timeout(2000)
+            continue
 
-                if not img_url or not nombre:
-                    continue
+        print(f"  ✔ {len(datos)} productos extraídos vía JS.")
 
-                if img_url.startswith("//"):
-                    img_url = "https:" + img_url
+        for item in datos[productos_descargados:]:
+            nombre  = item.get("nombre", "").strip()
+            img_url = item.get("img_src", "").strip()
 
-                pa        = encontrar_principio_activo(nombre, mapeo)
-                safe_nom  = nombre_archivo_seguro(nombre)
-                safe_pa   = nombre_archivo_seguro(pa)
-                extension = img_url.split("?")[0].split(".")[-1]
-                if extension not in ("jpg", "jpeg", "png", "webp"):
-                    extension = "jpg"
-
-                destino = OUTPUT_DIR / safe_pa / f"cruzverde_{safe_nom}.{extension}"
-                ok = await descargar_imagen(img_url, destino)
-
-                if ok:
-                    print(f"  ✓ {nombre[:50]} → {pa}")
-                    manifest.append({
-                        "fuente": "cruzverde",
-                        "nombre": nombre,
-                        "principio_activo": pa,
-                        "imagen_path": str(destino),
-                        "url_imagen": img_url,
-                        "categoria": categoria_url,
-                    })
-                    productos_encontrados += 1
-
-                await asyncio.sleep(DELAY)
-
-            except Exception as e:
-                print(f"  [ERROR card] {e}")
+            if not img_url:
                 continue
 
-            if productos_encontrados >= MAX_POR_CATEGORIA:
+            if not nombre:
+                nombre = "sin_nombre"
+
+            pa        = encontrar_principio_activo(nombre, mapeo)
+            safe_nom  = nombre_archivo_seguro(nombre)
+            safe_pa   = nombre_archivo_seguro(pa)
+            extension = img_url.split("?")[0].split(".")[-1]
+            if extension not in ("jpg", "jpeg", "png", "webp"):
+                extension = "jpg"
+
+            destino = OUTPUT_DIR / safe_pa / f"farmatodo_{safe_nom}.{extension}"
+            ok = await descargar_imagen(img_url, destino)
+
+            if ok:
+                print(f"  ✓ {nombre[:55]} → {pa}")
+                manifest.append({
+                    "fuente": "farmatodo",
+                    "nombre": nombre,
+                    "principio_activo": pa,
+                    "imagen_path": str(destino),
+                    "url_imagen": img_url,
+                    "categoria": categoria_url,
+                })
+                productos_descargados += 1
+
+            await asyncio.sleep(DELAY)
+
+            if productos_descargados >= MAX_POR_CATEGORIA:
                 break
 
-        if productos_encontrados >= MAX_POR_CATEGORIA:
+        if productos_descargados >= MAX_POR_CATEGORIA:
             break
 
-        btn = await page.query_selector(CRUZVERDE_SEL["ver_mas"])
+        # Intentar cargar más productos
+        btn = await page.query_selector(
+            "[class*='ver-mas'], button[class*='more'], [class*='load-more'], "
+            "[class*='siguiente'], [class*='next']"
+        )
         if not btn:
             break
         try:
@@ -345,7 +285,107 @@ async def scrapear_cruzverde(page, categoria_url: str, mapeo: dict, manifest: li
         except Exception:
             break
 
-    print(f"  Total descargados: {productos_encontrados}")
+    print(f"  Total descargados: {productos_descargados}")
+
+
+# ─── SCRAPER CRUZ VERDE ───────────────────────────────────────────────────────
+
+async def scrapear_cruzverde(page, categoria_url: str, mapeo: dict, manifest: list):
+    print(f"\n[CRUZ VERDE] {categoria_url}")
+    try:
+        await page.goto(categoria_url, wait_until="domcontentloaded", timeout=TIMEOUT_MS)
+        # Angular necesita más tiempo para renderizar el grid de productos
+        await page.wait_for_timeout(8000)
+    except Exception as e:
+        print(f"  [ERROR] No se pudo cargar: {e}")
+        return
+
+    productos_descargados = 0
+
+    for intento in range(5):
+        try:
+            resultado = await page.evaluate(_JS_CRUZVERDE)
+        except Exception as e:
+            print(f"  [ERROR JS] {e}")
+            break
+
+        if "error" in resultado:
+            print(f"  [AVISO] {resultado['error']}")
+            if intento == 0:
+                # Debug: mostrar todas las imágenes disponibles en la página
+                imgs = await page.evaluate(
+                    "() => Array.from(document.querySelectorAll('img')).slice(0,8).map(i => ({src: i.src, alt: i.alt}))"
+                )
+                print(f"  [DEBUG] Primeras 8 imágenes en página:")
+                for img in imgs:
+                    print(f"    src={img['src'][:80]} alt={img['alt']}")
+            await page.wait_for_timeout(3000)
+            continue
+
+        datos = resultado.get("cards", [])
+        print(f"  ✔ Grid encontrado. Hijos: {resultado.get('total_hijos', 0)} | Con imagen: {len(datos)}")
+
+        if not datos:
+            await page.wait_for_timeout(2000)
+            continue
+
+        for item in datos[productos_descargados:]:
+            nombre  = item.get("nombre", "").strip()
+            img_url = item.get("img_src", "").strip()
+
+            if not img_url:
+                continue
+
+            if not nombre:
+                nombre = "sin_nombre"
+
+            pa        = encontrar_principio_activo(nombre, mapeo)
+            safe_nom  = nombre_archivo_seguro(nombre)
+            safe_pa   = nombre_archivo_seguro(pa)
+            extension = img_url.split("?")[0].split(".")[-1]
+            if extension not in ("jpg", "jpeg", "png", "webp"):
+                extension = "jpg"
+
+            destino = OUTPUT_DIR / safe_pa / f"cruzverde_{safe_nom}.{extension}"
+            ok = await descargar_imagen(img_url, destino)
+
+            if ok:
+                print(f"  ✓ {nombre[:55]} → {pa}")
+                manifest.append({
+                    "fuente": "cruzverde",
+                    "nombre": nombre,
+                    "principio_activo": pa,
+                    "imagen_path": str(destino),
+                    "url_imagen": img_url,
+                    "categoria": categoria_url,
+                })
+                productos_descargados += 1
+
+            await asyncio.sleep(DELAY)
+
+            if productos_descargados >= MAX_POR_CATEGORIA:
+                break
+
+        if productos_descargados >= MAX_POR_CATEGORIA:
+            break
+
+        # Scroll para lazy loading + botón ver más
+        await page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        await page.wait_for_timeout(2000)
+        btn = await page.query_selector(
+            "button[class*='load-more'], [class*='loadMore'], [class*='ver-mas'], "
+            "button[class*='more'], [class*='siguiente']"
+        )
+        if not btn:
+            break
+        try:
+            await btn.scroll_into_view_if_needed()
+            await btn.click()
+            await page.wait_for_timeout(3000)
+        except Exception:
+            break
+
+    print(f"  Total descargados: {productos_descargados}")
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
