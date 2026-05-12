@@ -1,31 +1,38 @@
 from pathlib import Path
 
 import chromadb
-import torch
-import torch.nn as nn
-from PIL import Image, UnidentifiedImageError
-from torchvision import models, transforms
-
 from app.config import settings
 
+try:
+    import torch
+    import torch.nn as nn
+    from PIL import Image, UnidentifiedImageError
+    from torchvision import models, transforms
+    _TORCH_DISPONIBLE = True
+except ImportError:
+    _TORCH_DISPONIBLE = False
+    print("[CNN] PyTorch no instalado — búsqueda visual desactivada (OCR y KNN siguen funcionando).")
 
 
-_modelo: nn.Module | None = None
+
+_modelo = None
 _preprocess = None
 _collection = None
-_device = "cuda" if torch.cuda.is_available() else "cpu"
+_device = "cuda" if (_TORCH_DISPONIBLE and torch.cuda.is_available()) else "cpu"
 
 
 def _cargar_modelo():
     global _modelo, _preprocess
+    if not _TORCH_DISPONIBLE:
+        return
     if _modelo is not None:
         return
-    weights    = models.EfficientNet_B0_Weights.IMAGENET1K_V1
-    modelo     = models.efficientnet_b0(weights=weights)
-    modelo.classifier = nn.Identity()  
+    weights     = models.EfficientNet_B0_Weights.IMAGENET1K_V1
+    modelo      = models.efficientnet_b0(weights=weights)
+    modelo.classifier = nn.Identity()
     modelo.eval()
     modelo.to(_device)
-    _modelo    = modelo
+    _modelo     = modelo
     _preprocess = weights.transforms()
     print(f"[CNN] EfficientNet-B0 cargado en {_device}.")
 
@@ -45,8 +52,9 @@ def _cargar_coleccion():
     print(f"[CNN] ChromaDB cargado. {_collection.count()} imágenes indexadas.")
 
 
-
 def extraer_embedding(imagen_path: str) -> list[float] | None:
+    if not _TORCH_DISPONIBLE:
+        return None
     _cargar_modelo()
     try:
         img    = Image.open(imagen_path).convert("RGB")
@@ -54,33 +62,14 @@ def extraer_embedding(imagen_path: str) -> list[float] | None:
         with torch.no_grad():
             emb = _modelo(tensor).squeeze().cpu().numpy()
         return emb.tolist()
-    except (UnidentifiedImageError, FileNotFoundError, Exception) as e:
+    except Exception as e:
         print(f"[CNN] Error extrayendo embedding: {e}")
         return None
 
 
-
-def buscar_similares_visual(
-    imagen_path: str,
-    n_resultados: int = 5,
-) -> list[dict]:
-    """
-    Dado el path de una imagen (foto del empaque), busca los N medicamentos
-    más similares visualmente usando los embeddings almacenados en ChromaDB.
-
-    Retorna lista de dicts:
-    [
-        {
-            "nombre": str,
-            "principio_activo": str,
-            "fuente": str,
-            "similitud": float,   # 0-1, 1 = idéntico
-        },
-        ...
-    ]
-
-    Esta función es el FALLBACK del OCR en el pipeline principal.
-    """
+def buscar_similares_visual(imagen_path: str, n_resultados: int = 5) -> list[dict]:
+    if not _TORCH_DISPONIBLE:
+        return []
     _cargar_modelo()
     _cargar_coleccion()
 
@@ -104,7 +93,7 @@ def buscar_similares_visual(
 
     candidatos = []
     for meta, dist in zip(resultados["metadatas"][0], resultados["distances"][0]):
-        similitud = round(1.0 - float(dist), 4)  # distancia coseno → similitud
+        similitud = round(1.0 - float(dist), 4)
         if similitud >= settings.cnn_similarity_threshold:
             candidatos.append({
                 "nombre":           meta.get("nombre", ""),

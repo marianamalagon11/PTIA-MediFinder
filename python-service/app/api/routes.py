@@ -140,12 +140,9 @@ async def endpoint_analizar(
             try:
                 resultados_nombre = buscar_alternativas(nombre_norm, k=1)
                 if resultados_nombre:
-                    from app.ml.knn import _col_map, _df_catalogo, _normalizar
-                    col_pa = _col_map.get("pa")
-                    if col_pa:
-                        pa_identificado = resultados_nombre[0].get(col_pa)
+                    pa_identificado = resultados_nombre[0].get("principio_activo")
             except Exception:
-                pa_identificado = nombre_norm 
+                pa_identificado = nombre_norm
 
         else:
 
