@@ -1,0 +1,877 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{nyt/apasortcite//global/global/global}
+    \entry{acemi2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=d89cb8abcf05ce6d8331b24dc2fd03b3}{%
+           family={{Acemi}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{fullhash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{fullhashraw}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{bibnamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorbibnamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authornamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorfullhash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorfullhashraw}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{8}
+      \field{subtitle}{Salud en cifras edición 7}
+      \field{title}{Evolución del gasto privado en medicamentos en {Colombia} 2021--2025 ({I} Trim)}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://acemi.org.co/evolucion-del-gasto-privado-en-medicamentos-en-colombia-2021-2025-i-trim-salud-en-cifras-edicion-7/
+      \endverb
+      \verb{url}
+      \verb https://acemi.org.co/evolucion-del-gasto-privado-en-medicamentos-en-colombia-2021-2025-i-trim-salud-en-cifras-edicion-7/
+      \endverb
+    \endentry
+    \entry{arias2021}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=f4b0311f51e8ca423df006af236b9330}{%
+           family={Arias},
+           familyi={A\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Alcaldía de Bogotá}%
+      }
+      \strng{namehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{fullhash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{fullhashraw}{f4b0311f51e8ca423df006af236b9330}
+      \strng{bibnamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorbibnamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authornamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorfullhash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorfullhashraw}{f4b0311f51e8ca423df006af236b9330}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{2}
+      \field{title}{¿Cuál es la diferencia entre una {IPS} y una {EPS}?}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2021}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://bogota.gov.co/mi-ciudad/salud/cual-es-la-diferencia-entre-una-ips-y-una-eps
+      \endverb
+      \verb{url}
+      \verb https://bogota.gov.co/mi-ciudad/salud/cual-es-la-diferencia-entre-una-ips-y-una-eps
+      \endverb
+    \endentry
+    \entry{calero2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=de7a45794983ae9a8c2e99ec3906044f}{%
+           family={Calero},
+           familyi={C\bibinitperiod},
+           given={Carolina},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Cambio}%
+      }
+      \strng{namehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{fullhash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{fullhashraw}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{bibnamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorbibnamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authornamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorfullhash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorfullhashraw}{de7a45794983ae9a8c2e99ec3906044f}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{El precio de la salud: los medicamentos más costosos para el gasto público en {Colombia}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://cambiocolombia.com/economia/articulo/2025/9/el-precio-de-la-salud-los-medicamentos-mas-costosos-para-el-gasto-publico-en/
+      \endverb
+      \verb{url}
+      \verb https://cambiocolombia.com/economia/articulo/2025/9/el-precio-de-la-salud-los-medicamentos-mas-costosos-para-el-gasto-publico-en/
+      \endverb
+    \endentry
+    \entry{colprensa2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ca990b7026ea5ca15b509e5accfc3954}{%
+           family={Colprensa},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {El Universal}%
+      }
+      \strng{namehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{fullhash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{fullhashraw}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{bibnamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorbibnamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authornamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorfullhash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorfullhashraw}{ca990b7026ea5ca15b509e5accfc3954}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{Falta de medicamentos agudiza crisis de salud en {Colombia}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.eluniversal.com.co/colombia/2025/09/26/falta-de-medicamentos-agudiza-crisis-de-salud-en-colombia/
+      \endverb
+      \verb{url}
+      \verb https://www.eluniversal.com.co/colombia/2025/09/26/falta-de-medicamentos-agudiza-crisis-de-salud-en-colombia/
+      \endverb
+    \endentry
+    \entry{diaz2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=fe1c2f4fa98d62563ab10b4f467ffb02}{%
+           family={Díaz},
+           familyi={D\bibinitperiod},
+           given={E.\bibnamedelimi A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Revista Pesquisa Javeriana}%
+      }
+      \strng{namehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{fullhash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{fullhashraw}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{bibnamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorbibnamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authornamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorfullhash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorfullhashraw}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{6}
+      \field{title}{Crisis de medicamentos en {Colombia}, muchas causas y el más afectado es el paciente}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.javeriana.edu.co/pesquisa/porque-de-la-crisis-de-medicamentos/
+      \endverb
+      \verb{url}
+      \verb https://www.javeriana.edu.co/pesquisa/porque-de-la-crisis-de-medicamentos/
+      \endverb
+    \endentry
+    \entry{ibm2025cnn}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=cbf44511d041dc6d1dd73cc0c033122c}{%
+           family={{IBM}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{fullhash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{fullhashraw}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{bibnamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorbibnamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authornamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorfullhash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorfullhashraw}{cbf44511d041dc6d1dd73cc0c033122c}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{Redes neuronales convolucionales}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ibm.com/es-es/think/topics/convolutional-neural-networks
+      \endverb
+      \verb{url}
+      \verb https://www.ibm.com/es-es/think/topics/convolutional-neural-networks
+      \endverb
+    \endentry
+    \entry{invima_registros}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=1fa25bd93d36621c9ee2a849432ec52c}{%
+           family={{Instituto Nacional de Vigilancia de Medicamentos y Alimentos (INVIMA)}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {INVIMA}%
+      }
+      \strng{namehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{fullhash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{fullhashraw}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{bibnamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorbibnamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authornamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorfullhash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorfullhashraw}{1fa25bd93d36621c9ee2a849432ec52c}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Listado de registros sanitarios de medicamentos}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.invima.gov.co/biblioteca/listado-registros-sanitarios-medicamentos-invima
+      \endverb
+      \verb{url}
+      \verb https://www.invima.gov.co/biblioteca/listado-registros-sanitarios-medicamentos-invima
+      \endverb
+    \endentry
+    \entry{ibm2025knn}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=0b0ee043c5d5ce373995f25c08671606}{%
+           family={Kavlakoglu},
+           familyi={K\bibinitperiod},
+           given={Eda},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {IBM}%
+      }
+      \strng{namehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{fullhash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{fullhashraw}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{bibnamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorbibnamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authornamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorfullhash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorfullhashraw}{0b0ee043c5d5ce373995f25c08671606}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{{KNN}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ibm.com/mx-es/think/topics/knn
+      \endverb
+      \verb{url}
+      \verb https://www.ibm.com/mx-es/think/topics/knn
+      \endverb
+    \endentry
+    \entry{minsalud2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=72125e3fc075248de32acd96fcddd3dc}{%
+           family={{Ministerio de Salud y Protección Social de Colombia}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{bibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorbibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authornamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \field{extraname}{1}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{7}
+      \field{title}{La deuda acumulada de las {EPS} que asciende a 32 billones de pesos, evidencia el colapso del modelo actual de intermediación}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.minsalud.gov.co/CC/Noticias/2025/Paginas/deuda-acumulada-de-EPS-asciende-a-32-billones-de-pesos.aspx
+      \endverb
+      \verb{url}
+      \verb https://www.minsalud.gov.co/CC/Noticias/2025/Paginas/deuda-acumulada-de-EPS-asciende-a-32-billones-de-pesos.aspx
+      \endverb
+    \endentry
+    \entry{medicamentosaunclic}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=72125e3fc075248de32acd96fcddd3dc}{%
+           family={{Ministerio de Salud y Protección Social de Colombia}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {MinSalud Colombia}%
+      }
+      \strng{namehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{bibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorbibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authornamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \field{extraname}{2}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Medicamentos a un Clic}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://medicamentosaunclic.gov.co/
+      \endverb
+      \verb{url}
+      \verb https://medicamentosaunclic.gov.co/
+      \endverb
+    \endentry
+    \entry{saavedra2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ce3ce807675a7682684596eb3f0b0ac6}{%
+           family={Saavedra},
+           familyi={S\bibinitperiod},
+           given={Frank},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Infobae}%
+      }
+      \strng{namehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{fullhash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{fullhashraw}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{bibnamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorbibnamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authornamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorfullhash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorfullhashraw}{ce3ce807675a7682684596eb3f0b0ac6}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{Crisis por escasez de medicamentos básicos en hospitales: {Gobierno} anunció medidas para abastecimiento en {UCI}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.infobae.com/colombia/2025/09/03/gobierno-responde-a-crisis-de-medicamentos-criticos-en-hospitales-y-anuncio-medidas-para-abastecimiento-en-uci/
+      \endverb
+      \verb{url}
+      \verb https://www.infobae.com/colombia/2025/09/03/gobierno-responde-a-crisis-de-medicamentos-criticos-en-hospitales-y-anuncio-medidas-para-abastecimiento-en-uci/
+      \endverb
+    \endentry
+  \enddatalist
+  \datalist[entry]{nyt/global//global/global/global}
+    \entry{acemi2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=d89cb8abcf05ce6d8331b24dc2fd03b3}{%
+           family={{Acemi}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{fullhash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{fullhashraw}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{bibnamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorbibnamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authornamehash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorfullhash}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \strng{authorfullhashraw}{d89cb8abcf05ce6d8331b24dc2fd03b3}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{8}
+      \field{subtitle}{Salud en cifras edición 7}
+      \field{title}{Evolución del gasto privado en medicamentos en {Colombia} 2021--2025 ({I} Trim)}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://acemi.org.co/evolucion-del-gasto-privado-en-medicamentos-en-colombia-2021-2025-i-trim-salud-en-cifras-edicion-7/
+      \endverb
+      \verb{url}
+      \verb https://acemi.org.co/evolucion-del-gasto-privado-en-medicamentos-en-colombia-2021-2025-i-trim-salud-en-cifras-edicion-7/
+      \endverb
+    \endentry
+    \entry{arias2021}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=f4b0311f51e8ca423df006af236b9330}{%
+           family={Arias},
+           familyi={A\bibinitperiod},
+           given={John},
+           giveni={J\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Alcaldía de Bogotá}%
+      }
+      \strng{namehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{fullhash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{fullhashraw}{f4b0311f51e8ca423df006af236b9330}
+      \strng{bibnamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorbibnamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authornamehash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorfullhash}{f4b0311f51e8ca423df006af236b9330}
+      \strng{authorfullhashraw}{f4b0311f51e8ca423df006af236b9330}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{2}
+      \field{title}{¿Cuál es la diferencia entre una {IPS} y una {EPS}?}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2021}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://bogota.gov.co/mi-ciudad/salud/cual-es-la-diferencia-entre-una-ips-y-una-eps
+      \endverb
+      \verb{url}
+      \verb https://bogota.gov.co/mi-ciudad/salud/cual-es-la-diferencia-entre-una-ips-y-una-eps
+      \endverb
+    \endentry
+    \entry{calero2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=de7a45794983ae9a8c2e99ec3906044f}{%
+           family={Calero},
+           familyi={C\bibinitperiod},
+           given={Carolina},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Cambio}%
+      }
+      \strng{namehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{fullhash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{fullhashraw}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{bibnamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorbibnamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authornamehash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorfullhash}{de7a45794983ae9a8c2e99ec3906044f}
+      \strng{authorfullhashraw}{de7a45794983ae9a8c2e99ec3906044f}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{El precio de la salud: los medicamentos más costosos para el gasto público en {Colombia}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://cambiocolombia.com/economia/articulo/2025/9/el-precio-de-la-salud-los-medicamentos-mas-costosos-para-el-gasto-publico-en/
+      \endverb
+      \verb{url}
+      \verb https://cambiocolombia.com/economia/articulo/2025/9/el-precio-de-la-salud-los-medicamentos-mas-costosos-para-el-gasto-publico-en/
+      \endverb
+    \endentry
+    \entry{colprensa2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ca990b7026ea5ca15b509e5accfc3954}{%
+           family={Colprensa},
+           familyi={C\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {El Universal}%
+      }
+      \strng{namehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{fullhash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{fullhashraw}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{bibnamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorbibnamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authornamehash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorfullhash}{ca990b7026ea5ca15b509e5accfc3954}
+      \strng{authorfullhashraw}{ca990b7026ea5ca15b509e5accfc3954}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{Falta de medicamentos agudiza crisis de salud en {Colombia}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.eluniversal.com.co/colombia/2025/09/26/falta-de-medicamentos-agudiza-crisis-de-salud-en-colombia/
+      \endverb
+      \verb{url}
+      \verb https://www.eluniversal.com.co/colombia/2025/09/26/falta-de-medicamentos-agudiza-crisis-de-salud-en-colombia/
+      \endverb
+    \endentry
+    \entry{diaz2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=fe1c2f4fa98d62563ab10b4f467ffb02}{%
+           family={Díaz},
+           familyi={D\bibinitperiod},
+           given={E.\bibnamedelimi A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Revista Pesquisa Javeriana}%
+      }
+      \strng{namehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{fullhash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{fullhashraw}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{bibnamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorbibnamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authornamehash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorfullhash}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \strng{authorfullhashraw}{fe1c2f4fa98d62563ab10b4f467ffb02}
+      \field{sortinit}{D}
+      \field{sortinithash}{6f385f66841fb5e82009dc833c761848}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{6}
+      \field{title}{Crisis de medicamentos en {Colombia}, muchas causas y el más afectado es el paciente}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.javeriana.edu.co/pesquisa/porque-de-la-crisis-de-medicamentos/
+      \endverb
+      \verb{url}
+      \verb https://www.javeriana.edu.co/pesquisa/porque-de-la-crisis-de-medicamentos/
+      \endverb
+    \endentry
+    \entry{ibm2025cnn}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=cbf44511d041dc6d1dd73cc0c033122c}{%
+           family={{IBM}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{fullhash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{fullhashraw}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{bibnamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorbibnamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authornamehash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorfullhash}{cbf44511d041dc6d1dd73cc0c033122c}
+      \strng{authorfullhashraw}{cbf44511d041dc6d1dd73cc0c033122c}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{Redes neuronales convolucionales}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ibm.com/es-es/think/topics/convolutional-neural-networks
+      \endverb
+      \verb{url}
+      \verb https://www.ibm.com/es-es/think/topics/convolutional-neural-networks
+      \endverb
+    \endentry
+    \entry{invima_registros}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=1fa25bd93d36621c9ee2a849432ec52c}{%
+           family={{Instituto Nacional de Vigilancia de Medicamentos y Alimentos (INVIMA)}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {INVIMA}%
+      }
+      \strng{namehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{fullhash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{fullhashraw}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{bibnamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorbibnamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authornamehash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorfullhash}{1fa25bd93d36621c9ee2a849432ec52c}
+      \strng{authorfullhashraw}{1fa25bd93d36621c9ee2a849432ec52c}
+      \field{sortinit}{I}
+      \field{sortinithash}{8d291c51ee89b6cd86bf5379f0b151d8}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Listado de registros sanitarios de medicamentos}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.invima.gov.co/biblioteca/listado-registros-sanitarios-medicamentos-invima
+      \endverb
+      \verb{url}
+      \verb https://www.invima.gov.co/biblioteca/listado-registros-sanitarios-medicamentos-invima
+      \endverb
+    \endentry
+    \entry{ibm2025knn}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=0b0ee043c5d5ce373995f25c08671606}{%
+           family={Kavlakoglu},
+           familyi={K\bibinitperiod},
+           given={Eda},
+           giveni={E\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {IBM}%
+      }
+      \strng{namehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{fullhash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{fullhashraw}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{bibnamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorbibnamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authornamehash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorfullhash}{0b0ee043c5d5ce373995f25c08671606}
+      \strng{authorfullhashraw}{0b0ee043c5d5ce373995f25c08671606}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{11}
+      \field{title}{{KNN}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.ibm.com/mx-es/think/topics/knn
+      \endverb
+      \verb{url}
+      \verb https://www.ibm.com/mx-es/think/topics/knn
+      \endverb
+    \endentry
+    \entry{minsalud2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=72125e3fc075248de32acd96fcddd3dc}{%
+           family={{Ministerio de Salud y Protección Social de Colombia}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{bibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorbibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authornamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \field{extraname}{1}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{7}
+      \field{title}{La deuda acumulada de las {EPS} que asciende a 32 billones de pesos, evidencia el colapso del modelo actual de intermediación}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.minsalud.gov.co/CC/Noticias/2025/Paginas/deuda-acumulada-de-EPS-asciende-a-32-billones-de-pesos.aspx
+      \endverb
+      \verb{url}
+      \verb https://www.minsalud.gov.co/CC/Noticias/2025/Paginas/deuda-acumulada-de-EPS-asciende-a-32-billones-de-pesos.aspx
+      \endverb
+    \endentry
+    \entry{medicamentosaunclic}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=72125e3fc075248de32acd96fcddd3dc}{%
+           family={{Ministerio de Salud y Protección Social de Colombia}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {MinSalud Colombia}%
+      }
+      \strng{namehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{fullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{bibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorbibnamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authornamehash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhash}{72125e3fc075248de32acd96fcddd3dc}
+      \strng{authorfullhashraw}{72125e3fc075248de32acd96fcddd3dc}
+      \field{extraname}{2}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Medicamentos a un Clic}
+      \field{urlday}{5}
+      \field{urlmonth}{4}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://medicamentosaunclic.gov.co/
+      \endverb
+      \verb{url}
+      \verb https://medicamentosaunclic.gov.co/
+      \endverb
+    \endentry
+    \entry{saavedra2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=ce3ce807675a7682684596eb3f0b0ac6}{%
+           family={Saavedra},
+           familyi={S\bibinitperiod},
+           given={Frank},
+           giveni={F\bibinitperiod},
+           givenun=0}}%
+      }
+      \list{organization}{1}{%
+        {Infobae}%
+      }
+      \strng{namehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{fullhash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{fullhashraw}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{bibnamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorbibnamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authornamehash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorfullhash}{ce3ce807675a7682684596eb3f0b0ac6}
+      \strng{authorfullhashraw}{ce3ce807675a7682684596eb3f0b0ac6}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{month}{9}
+      \field{title}{Crisis por escasez de medicamentos básicos en hospitales: {Gobierno} anunció medidas para abastecimiento en {UCI}}
+      \field{urlday}{17}
+      \field{urlmonth}{2}
+      \field{urlyear}{2026}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.infobae.com/colombia/2025/09/03/gobierno-responde-a-crisis-de-medicamentos-criticos-en-hospitales-y-anuncio-medidas-para-abastecimiento-en-uci/
+      \endverb
+      \verb{url}
+      \verb https://www.infobae.com/colombia/2025/09/03/gobierno-responde-a-crisis-de-medicamentos-criticos-en-hospitales-y-anuncio-medidas-para-abastecimiento-en-uci/
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+
