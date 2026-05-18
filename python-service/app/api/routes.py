@@ -8,13 +8,13 @@ from pydantic import BaseModel
 from app.config import settings
 from app.ml import (
     buscar_alternativas,
+    buscar_pa_por_nombre,
     buscar_similares_visual,
     explicar_compuesto,
     extraer_texto_imagen,
 )
 
 router = APIRouter(prefix="/medifinder", tags=["MediFinder"])
-
 
 
 class OCRResult(BaseModel):
@@ -49,13 +49,12 @@ class ExplicacionCompuesto(BaseModel):
 
 
 class AnalisisCompleto(BaseModel):
-    metodo_identificacion: str          
+    metodo_identificacion: str
     ocr: Optional[OCRResult]
     candidatos_visuales: list[CandidatoVisual]
     principio_activo_identificado: Optional[str]
     alternativas: list[Alternativa]
     explicacion: Optional[ExplicacionCompuesto]
-
 
 
 @router.post("/ocr", response_model=OCRResult, summary="Extrae texto de una imagen de medicamento")
@@ -114,45 +113,65 @@ async def endpoint_analizar(
     incluir_explicacion: bool = Form(True),
     k_alternativas: int = Form(5),
 ):
-    """
-    Pipeline completo de MediFinder:
-    1. OCR sobre la imagen
-    2. Si OCR falla → CNN fallback (búsqueda visual en ChromaDB)
-    3. KNN para alternativas por principio activo
-    4. LLM para explicación del compuesto
-    """
     contenido = await imagen.read()
-    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+
+    # Usar la extensión real del archivo subido para que PIL lo reconozca correctamente
+    from pathlib import Path as _Path
+    suffix = _Path(imagen.filename).suffix if imagen.filename else ".jpg"
+    if not suffix:
+        suffix = ".jpg"
+
+    with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
         tmp.write(contenido)
+        tmp.flush()
         tmp_path = tmp.name
 
+    ocr_result: dict = {}
     try:
         ocr_result      = extraer_texto_imagen(tmp_path)
         candidatos_vis  = []
         pa_identificado = None
         metodo          = "fallback"
 
-        if ocr_result.get("ocr_exitoso") and ocr_result.get("confianza", 0) >= settings.ocr_confidence_threshold:
+        # CNN siempre se intenta para tener candidatos visuales disponibles
+        try:
+            candidatos_vis = buscar_similares_visual(tmp_path, n_resultados=5)
+        except Exception as e:
+            print(f"[PIPELINE] CNN no disponible: {e}")
 
+        confianza   = ocr_result.get("confianza", 0)
+        ocr_exitoso = ocr_result.get("ocr_exitoso", False)
+        ocr_con_error = "error" in ocr_result
+
+        if not ocr_con_error and ocr_exitoso and confianza >= settings.ocr_confidence_threshold:
             metodo = "ocr"
-
             nombre_norm = ocr_result.get("nombre_normalizado", "")
             try:
-                resultados_nombre = buscar_alternativas(nombre_norm, k=1)
-                if resultados_nombre:
-                    pa_identificado = resultados_nombre[0].get("principio_activo")
+                pa_identificado = buscar_pa_por_nombre(nombre_norm)
+            except Exception as e:
+                print(f"[PIPELINE] Error lookup nombre→PA: {e}")
+                pa_identificado = None
+
+            if not pa_identificado and candidatos_vis:
+                pa_identificado = candidatos_vis[0]["principio_activo"]
+                metodo = "ocr+cnn"
+
+        elif not ocr_con_error and ocr_exitoso:
+            metodo = "ocr_bajo_conf"
+            nombre_norm = ocr_result.get("nombre_normalizado", "")
+            try:
+                pa_identificado = buscar_pa_por_nombre(nombre_norm, threshold=65)
             except Exception:
-                pa_identificado = nombre_norm
+                pa_identificado = None
+
+            if not pa_identificado and candidatos_vis:
+                pa_identificado = candidatos_vis[0]["principio_activo"]
+                metodo = "cnn"
 
         else:
-
             metodo = "cnn"
-            try:
-                candidatos_vis = buscar_similares_visual(tmp_path, n_resultados=5)
-                if candidatos_vis:
-                    pa_identificado = candidatos_vis[0]["principio_activo"]
-            except Exception as e:
-                print(f"[PIPELINE] Error CNN: {e}")
+            if candidatos_vis:
+                pa_identificado = candidatos_vis[0]["principio_activo"]
 
         alternativas = []
         if pa_identificado:
@@ -168,7 +187,7 @@ async def endpoint_analizar(
         explicacion = None
         if incluir_explicacion and pa_identificado:
             try:
-                exp_raw    = explicar_compuesto(pa_identificado)
+                exp_raw     = explicar_compuesto(pa_identificado)
                 explicacion = ExplicacionCompuesto(**exp_raw)
             except Exception as e:
                 print(f"[PIPELINE] Error LLM: {e}")
@@ -176,9 +195,14 @@ async def endpoint_analizar(
     finally:
         os.unlink(tmp_path)
 
+    # Solo construir OCRResult si el OCR no tuvo error y tiene todos los campos
+    ocr_model = None
+    if ocr_result and "error" not in ocr_result and "texto_completo" in ocr_result:
+        ocr_model = OCRResult(**ocr_result)
+
     return AnalisisCompleto(
         metodo_identificacion=metodo,
-        ocr=OCRResult(**ocr_result) if "ocr_exitoso" in ocr_result else None,
+        ocr=ocr_model,
         candidatos_visuales=[CandidatoVisual(**c) for c in candidatos_vis],
         principio_activo_identificado=pa_identificado,
         alternativas=alternativas,
