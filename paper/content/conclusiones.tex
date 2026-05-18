@@ -1,5 +1,55 @@
-\section{Conclusiones}
+\section{Reflexiones}
 
-Se estima que, mediante esta implementación del modelo IA entrenado para dar medicamentos similares, se logre brindar una solución temporal ante la problemática de la deuda y sus desencadenantes, pero también lograr implementarla de mejor manera como una ayuda a las personas, unido con entidades del sector de la salud, para brindar ese apoyo ante recomendaciones de fármacos aptos para cada situación que pueda estar viviendo cada paciente.
+% ─── A. LECCIONES APRENDIDAS ──────────────────────────────────────────────────
+
+\subsection{Lecciones aprendidas}
+
+\subsubsection*{Acierto 1: La verificación humana como mitigador estructural de errores de OCR}
+
+Incluir una etapa de verificación manual entre el OCR y el KNN resultó ser la decisión arquitectónica más importante del proyecto. Al mostrar los campos extraídos de forma editable antes de ejecutar las recomendaciones, el sistema puede operar con un OCR de precisión moderada (70--80\,\% en condiciones ideales de caja) sin comprometer la calidad de las alternativas entregadas. Un error de reconocimiento de ``CEFALEXINA'' como ``CEFALEX1NA'' se corrige en un segundo de interacción, mientras que si ese error se propagase silenciosamente al KNN podría producir recomendaciones completamente irrelevantes.
+
+El aprendizaje es que, en aplicaciones de salud donde el costo de un error es alto, diseñar \textit{checkpoints} humanos explícitos en el pipeline es más robusto que intentar eliminar todos los errores del modelo de IA. La IA no necesita ser perfecta si el flujo garantiza que el usuario valida antes de que se tome una decisión relevante.
+
+\subsubsection*{Acierto 2: Priorizar la amplitud del catálogo sobre la sofisticación del modelo}
+
+La decisión de utilizar el catálogo oficial completo del INVIMA (153.523 registros sanitarios) como base de datos del sistema, en lugar de construir un dataset propio reducido, demostró que para un MVP con impacto real la \textbf{calidad y amplitud de los datos supera a la complejidad del modelo}. El algoritmo KNN usado es conceptualmente simple (NearestNeighbors con representaciones vectoriales de texto), pero opera sobre un catálogo exhaustivo que cubre cualquier medicamento con registro colombiano vigente.
+
+El aprendizaje es que en sistemas de recomendación orientados a usuarios finales, la cobertura (que el medicamento del usuario exista en el catálogo) es un prerrequisito más crítico que la precisión del ranking. Un sistema muy preciso sobre 100 medicamentos es menos útil que uno moderadamente preciso sobre 150.000.
+
+\subsubsection*{Error 1: Subestimar la heterogeneidad del catálogo INVIMA}
+
+El catálogo del INVIMA registra el mismo principio activo de formas inconsistentes a lo largo de sus registros. ``Cefalexina'' aparece como ``cefalexina'', ``cefalexina base'', ``cefalexina monohidrato'', ``cefalexina monohidrato compactada'', ``cefalexina monohidrato polvo liofilizado equivalente a cefalexina base anhidra'', entre otras variantes. Inicialmente, el sistema trataba estas cadenas como sustancias distintas y devolvía el mismo medicamento hasta tres veces en las recomendaciones, con diferente entrada del catálogo pero información visible idéntica.
+
+Fue necesario implementar una deduplicación en dos capas: primero por nombre comercial normalizado (sin tildes, minúsculas) y luego por perfil clínico (concentración numérica extraída + forma farmacéutica normalizada), además de restricciones en el patrón de matching del principio activo para el caso específico de la notación ``X equivalente a Y mg de X base'' del INVIMA.
+
+El aprendizaje es que los datos del mundo real provenientes de fuentes gubernamentales requieren un análisis exploratorio detallado antes de integrarlos en un sistema de recomendación. La limpieza y normalización de datos no es una tarea menor ni opcional: en este proyecto representó la mayor fuente de errores visibles para el usuario y la mayor parte del tiempo de corrección del sistema.
+
+\subsubsection*{Error 2: No contemplar la diferencia entre imagen de galería e imagen de cámara}
+
+Durante el desarrollo inicial, el sistema se probó casi exclusivamente con imágenes subidas desde galería, donde la calidad y el nombre del archivo son controlables. Al integrar la funcionalidad de cámara en tiempo real, surgieron diferencias importantes: las imágenes de cámara llegan siempre con el nombre genérico \texttt{foto\_medicamento.jpg} (sin información del medicamento en el nombre), tienen variaciones de iluminación, pueden estar desenfocadas y la resolución capturada depende del dispositivo.
+
+Esto generó discrepancias entre los resultados observados en pruebas internas (con imágenes nítidas de galería) y el comportamiento real con cámara. Fue necesario ampliar el pipeline de OCR de 4 variantes de preprocesamiento a 6 (añadiendo imagen invertida para fondos oscuros y filtro bilateral para preservar bordes en fotos borrosas), y ampliar los modos PSM de Tesseract para cubrir el caso de texto en una sola línea prominente.
+
+El aprendizaje es que en aplicaciones móviles que dependen de visión por computadora, las pruebas deben realizarse desde el inicio con imágenes representativas del canal de entrada real (cámara del dispositivo), no solo con imágenes de referencia de alta calidad. El entorno de captura es parte del sistema.
+
+% ─── B. CONCLUSIONES Y TRABAJO FUTURO ────────────────────────────────────────
+
+\subsection{Conclusiones y trabajo futuro}
+
+\subsubsection*{Conclusión 1: Viabilidad del pipeline OCR → verificación → KNN para el contexto colombiano}
+
+El pipeline implementado demostró ser viable como herramienta de apoyo durante la crisis de desabastecimiento de medicamentos en Colombia. Para imágenes de caja bajo condiciones adecuadas de iluminación, el sistema logra identificar el medicamento y retornar alternativas con equivalencia por principio activo en un tiempo de respuesta inferior a 10 segundos. La combinación de OCR + fuzzy matching contra el catálogo INVIMA completo (153.523 registros) cubre la totalidad de los medicamentos con registro sanitario colombiano vigente, lo que representa una cobertura teórica suficiente para el caso de uso propuesto. La verificación humana integrada al flujo garantiza que los errores del OCR no se propaguen como recomendaciones incorrectas, haciendo al sistema \textbf{robusto ante sus propias limitaciones}.
+
+\subsubsection*{Conclusión 2: La calidad de las recomendaciones está acotada por la calidad del catálogo}
+
+El sistema de recomendación KNN es tan bueno como los datos sobre los que opera. La heterogeneidad en la nomenclatura de principios activos del catálogo INVIMA ---que refleja la ausencia de un vocabulario controlado en los registros sanitarios colombianos--- limita la precisión de las equivalencias y obliga a implementar reglas de normalización frágiles que pueden fallar con nombres no contemplados. Esta es la limitación técnica más relevante del prototipo: no es la precisión del modelo KNN, sino la inconsistencia de los datos de entrada. Para que un sistema como MediFinder opere a escala con alta confiabilidad, sería necesario un proceso previo de estandarización de principios activos con respaldo farmacológico (por ejemplo, basado en el sistema ATC de la OMS).
+
+\subsubsection*{Conclusión 3: La CNN como fallback visual es promisoria pero requiere datos representativos}
+
+La integración de una CNN de respaldo para los casos en que el OCR falla (imágenes de blíster con reflejos, baja iluminación, texto ilegible) es una extensión arquitectónica correcta y coherente con los trabajos relacionados revisados. Sin embargo, en el estado actual del prototipo, el espacio de embeddings visuales construido sobre un conjunto reducido de imágenes de referencia limita el alcance del fallback. La CNN actualmente tiene utilidad principalmente para los medicamentos cuyas imágenes formaron parte del conjunto de construcción de embeddings. Para que este componente sea un mecanismo de respaldo real a escala nacional, se requeriría un dataset de imágenes de empaques colombianos fotografiados en condiciones de usuario final (iluminación variable, diferentes ángulos, fondos heterogéneos), lo cual constituye un trabajo de recolección de datos aún por realizar.
+
+\subsubsection*{Trabajo futuro}
+
+La mejora con mayor impacto potencial para el sistema sería integrar la API de \textit{Medicamentos a un Clic} del Ministerio de Salud y Protección Social para incorporar información de \textbf{disponibilidad geográfica en tiempo real}. Actualmente, MediFinder puede decirle al paciente \textit{qué} medicamentos son equivalentes al suyo, pero no \textit{dónde} puede conseguirlos. Enlazar cada alternativa recomendada con datos de disponibilidad por municipio o departamento transformaría el sistema de una herramienta informativa a una herramienta operativa, que es lo que el paciente realmente necesita en el contexto de la crisis de desabastecimiento: no solo conocer el nombre del genérico equivalente, sino encontrar la farmacia más cercana donde esté disponible.
 
 \pagebreak

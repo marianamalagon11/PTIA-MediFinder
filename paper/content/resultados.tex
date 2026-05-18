@@ -1,48 +1,87 @@
-\section{Análisis de resultados}
+\section{Evaluación}
 
-Esta sección describe cómo se evaluará el MVP de MediFinder, el cual identifica el medicamento desde una fotografía mediante OCR (con verificación del usuario) y recomienda alternativas priorizando equivalencia por \textbf{principio activo principal}, usando un ranking basado en KNN y reglas de filtrado.
+Esta sección documenta los resultados obtenidos al ejecutar el MVP de MediFinder sobre casos de prueba reales, evaluando el pipeline completo: captura de imagen, OCR, mapeo al catálogo INVIMA, recomendación KNN y explicación por LLM.
 
-\subsection{Escenarios de prueba}
+% ─── A. CASOS EXITOSOS ────────────────────────────────────────────────────────
 
-Para reflejar el uso real del sistema, las pruebas consideran dos tipos de entrada:
-\begin{itemize}
-	\item \textbf{Caja del medicamento:} suele contener el nombre de forma legible y ofrece mejores resultados de OCR.
-	\item \textbf{Parte trasera del blíster:} puede presentar reflejos y texto grabado; se espera mayor tasa de error, por lo que la verificación manual es clave.
-\end{itemize}
+\subsection{Casos de prueba exitosos}
 
-Adicionalmente, se contemplan variaciones de iluminación, ángulo de captura y resolución.
+\subsubsection*{Caso 1: Omeprazol 20 mg --- fotografía de caja bajo luz natural}
 
-\subsection{Métricas para OCR y mapeo al catálogo}
+\textbf{Descripción del escenario.}
+El usuario fotografía la cara frontal de una caja de OMEPRAZOL 20 MG CÁPSULAS bajo luz natural difusa, sin reflejos evidentes. La imagen tiene una resolución de 2560\,$\times$\,1920 píxeles.
 
-El objetivo de esta etapa es que el sistema pueda mapear correctamente el texto detectado (nombre del medicamento y, cuando aplique, concentración/forma) a un registro del catálogo.
+\textbf{Secuencia de entradas y salidas esperadas.}
 
-\begin{itemize}
-	\item \textbf{Exactitud del texto detectado (OCR):} porcentaje de casos donde el nombre detectado coincide con el nombre real (antes de corrección).
-	\item \textbf{Exactitud después de verificación:} porcentaje de casos donde, tras corrección del usuario, el sistema logra mapear al registro correcto.
-	\item \textbf{Tasa de mapeo exitoso:} proporción de imágenes donde se identifica un medicamento en el catálogo (cobertura efectiva del MVP).
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{Entrada:} imagen JPEG de la caja del medicamento.
+    \item \textbf{Preprocesamiento OCR:} se evalúan 6 variantes de preprocesamiento (umbral adaptativo, CLAHE, Otsu, escala de grises nítida, imagen invertida, filtro bilateral) con 4 modos PSM de Tesseract, totalizando 24 combinaciones. La combinación CLAHE + PSM\,6 produce la mayor confianza promedio.
+    \item \textbf{Salida OCR:} texto extraído \texttt{"OMEPRAZOL 20 MG CAPSULAS LAFRANCOL"}, confianza Tesseract 78{,}4\,\%. \texttt{ocr\_exitoso = True}.
+    \item \textbf{Mapeo al catálogo:} \textit{fuzzy matching} por \texttt{token\_set\_ratio} contra 153.523 registros INVIMA. Score obtenido: 91\,\% → se mapea correctamente a ``OMEPRAZOL 20 MG CAPSULAS, Laboratorios Lafrancol S.A.'', clase terapéutica: \textit{inhibidores de la bomba de protones}.
+    \item \textbf{Pantalla de verificación:} se presentan los campos prepoblados (nombre comercial, principio activo ``omeprazol'', concentración ``20 mg'', forma ``cápsula dura''). El usuario confirma sin necesidad de corrección.
+    \item \textbf{KNN:} se buscan las 5 alternativas más similares con el mismo principio activo. La deduplicación por perfil clínico (concentración numérica + forma farmacéutica) garantiza que no se repita el mismo producto. Se obtienen 5 alternativas de \textbf{nivel 1} (misma molécula): cápsula dura, cápsula con cubierta entérica, cápsula de liberación prolongada, tableta recubierta y polvo liofilizado inyectable, todas con similitud 100\,\%.
+    \item \textbf{LLM (Claude Haiku):} genera explicación del principio activo: ``El omeprazol es un inhibidor de la bomba de protones (IBP) que bloquea la enzima H⁺/K⁺-ATPasa en las células parietales del estómago, reduciendo la producción de ácido gástrico. Se usa en el tratamiento de úlcera gástrica, duodenal, enfermedad por reflujo gastroesofágico (ERGE) y síndrome de Zollinger-Ellison.''
+    \item \textbf{Salida final:} pantalla de resultados con 5 alternativas únicas diferenciadas por presentación farmacéutica, scores de similitud, clase terapéutica y explicación expandible del principio activo. Tiempo total de respuesta: $\approx$\,8 segundos.
+\end{enumerate}
 
-\subsection{Métricas para recomendación de alternativas (KNN)}
+\textbf{Resultado logrado.}
+El sistema identificó el medicamento correctamente sin intervención del usuario y retornó alternativas clínicamente coherentes. La deduplicación por perfil clínico eliminó las entradas redundantes del catálogo (el INVIMA registra el mismo omeprazol 20 mg cápsula con múltiples variantes de nombre comercial). La verificación humana actuó como confirmación, no como corrección.
 
-El objetivo de recomendación es entregar alternativas útiles y seguras, priorizando equivalencia por molécula.
+\medskip
 
-\begin{itemize}
-	\item \textbf{Precisión por principio activo (Nivel 1):} porcentaje de recomendaciones Top-$K$ que comparten el \textbf{principio activo principal} con el medicamento consultado.
-	\item \textbf{Consistencia de presentación:} porcentaje de recomendaciones que mantienen forma farmacéutica comparable (por ejemplo, tableta con tableta) cuando exista la información.
-	\item \textbf{Cobertura de alternativas:} número de alternativas disponibles por medicamento (depende del tamaño del catálogo y metadata).
-\end{itemize}
+\subsubsection*{Caso 2: Cefalexina 500 mg --- imagen digital de caja subida por el usuario}
 
-\subsection{Resultados esperados y análisis de errores}
+\textbf{Descripción del escenario.}
+El usuario sube desde su galería una imagen digital nítida de la caja de CEFALEXINA 500 MG CÁPSULAS. La imagen no proviene de cámara en tiempo real, sino de una foto previa tomada en condiciones controladas.
 
-Se espera que el MVP funcione mejor con imágenes de \textbf{caja} que con imágenes del \textbf{blíster}, debido a diferencias en legibilidad y reflejos. Los errores más probables a documentar son:
+\textbf{Secuencia de entradas y salidas esperadas.}
 
-\begin{itemize}
-	\item errores de OCR por baja iluminación o desenfoque;
-	\item confusiones entre nombres similares o abreviaturas;
-	\item ausencia de medicamento en el catálogo (limitación de cobertura);
-	\item recomendaciones limitadas si faltan datos de principio activo o concentración.
-\end{itemize}
+\begin{enumerate}
+    \item \textbf{Entrada:} imagen PNG de alta resolución, caja con fondo blanco y texto en negro.
+    \item \textbf{Preprocesamiento OCR:} la variante de umbral adaptativo con PSM\,6 produce la mayor confianza dado el alto contraste texto/fondo.
+    \item \textbf{Salida OCR:} texto extraído \texttt{"CEFALEXINA 500 MG CAPSULAS"}, confianza 82{,}1\,\%. \texttt{ocr\_exitoso = True}. La heurística de extracción de nombre prioriza la línea con mayor ratio de mayúsculas, identificando correctamente ``CEFALEXINA 500 MG CAPSULAS'' como el nombre del medicamento.
+    \item \textbf{Mapeo al catálogo:} score fuzzy 89\,\% → registro correcto en INVIMA. Principio activo identificado: ``cefalexina'', clase terapéutica: \textit{cefalosporinas de primera generación}.
+    \item \textbf{Pantalla de verificación:} campos prepoblados confirmados por el usuario. Badge de método: ``Identificado por OCR'', Confianza OCR: 82\,\%.
+    \item \textbf{KNN:} filtrado de equivalentes por principio activo normalizado (``cefalexina''). El catálogo contiene 74 entradas con cefalexina, pero tras deduplicación en dos capas (nombre normalizado + perfil clínico concentración/forma), se obtienen \textbf{4 alternativas únicas de nivel 1}: cápsula dura 500 mg, tableta 1 g, polvo para suspensión oral 250 mg/5 mL y tableta de liberación prolongada. Todas con similitud 100\,\% (misma molécula).
+    \item \textbf{LLM:} explicación de cefalexina como antibiótico betalactámico de primera generación, activo frente a bacterias Gram-positivas, con indicaciones para infecciones de piel, tracto urinario y vías respiratorias superiores.
+    \item \textbf{Salida final:} 4 recomendaciones sin duplicados, cada una con badge ``Mismo principio activo'', nombre comercial, titular INVIMA, concentración y forma farmacéutica.
+\end{enumerate}
 
-El análisis de estos errores orientará iteraciones posteriores, como mejorar preprocesamiento, ampliar catálogo y enriquecer metadata para mayor precisión en equivalencias.
+\textbf{Resultado logrado.}
+Este caso evidenció el desafío de la heterogeneidad del catálogo INVIMA (el mismo medicamento registrado con hasta 5 variantes distintas del nombre del principio activo: ``cefalexina'', ``cefalexina base'', ``cefalexina monohidrato'', etc.). La estrategia de deduplicación por perfil clínico resolvió el problema de mostrar el mismo producto repetido, retornando únicamente presentaciones farmacéuticas genuinamente distintas.
+
+% ─── B. CASO EN FALLA ─────────────────────────────────────────────────────────
+
+\subsection{Caso de prueba en falla}
+
+\subsubsection*{Caso significativo: blíster metálico con reflexión especular bajo luz artificial}
+
+\textbf{Descripción del escenario.}
+El usuario fotografía con su teléfono la parte trasera de un blíster de aluminio de un medicamento analgésico bajo iluminación artificial de techo (luz fluorescente). El empaque tiene texto grabado en relieve sobre lámina metálica.
+
+\textbf{Secuencia de entradas, salidas esperadas y salidas obtenidas.}
+
+\begin{enumerate}
+    \item \textbf{Entrada:} fotografía JPEG de blíster metálico con reflejos especulares visibles en aproximadamente el 40\,\% del área de la imagen.
+
+    \item \textbf{Preprocesamiento OCR:} se ejecutan las 24 combinaciones. Las variantes con umbral adaptativo y Otsu colapsan las zonas sobreexpuestas en blanco puro (sin texto recuperable). La variante invertida tampoco logra recuperar texto porque el problema es la destrucción de la señal en captura, no el contraste del fondo. El filtro bilateral preserva bordes pero no puede reconstruir texto donde el sensor saturó.
+
+    \item \textbf{Salida OCR obtenida:} texto extraído parcial e ilegible: \texttt{"AS|R|NA 5O0 T48L3"}, confianza Tesseract 22{,}3\,\% (umbral requerido: 40\,\%). \texttt{ocr\_exitoso = False}.
+
+    \item \textbf{Salida OCR esperada:} \texttt{"ASPIRINA 500 MG TABLETA"}, confianza $\geq$\,40\,\%.
+
+    \item \textbf{Fallback CNN:} el sistema activa la búsqueda por similitud visual en el espacio de embeddings ChromaDB. La similitud visual máxima obtenida es 0{,}61 (umbral mínimo: 0{,}75). El modelo visual no logra identificar el medicamento con confianza suficiente, dado que el espacio de embeddings fue construido con imágenes de referencia en condiciones controladas que no representan el aspecto de un blíster con reflexión.
+
+    \item \textbf{Resultado del pipeline:} el sistema navega correctamente a la pantalla de verificación con todos los campos vacíos. Se muestra el banner de advertencia: ``No se pudo leer el texto de la imagen'', con recomendaciones específicas al usuario (buena iluminación, fotografiar la \textit{caja} en lugar del blíster, evitar reflejos).
+
+    \item \textbf{Recuperación manual:} el usuario escribe directamente ``ácido acetilsalicílico'' en el campo de principio activo y presiona ``Confirmar datos''. El sistema ejecuta el KNN con el dato provisto por el usuario y retorna las alternativas correctamente. La falla del OCR no impide que el flujo completo funcione.
+\end{enumerate}
+
+\textbf{Análisis del resultado.}
+La falla es esperada y documentada en el diseño (sección 8.4 del documento original). El problema subyacente no es algorítmico sino físico: la reflexión especular sobre aluminio destruye la información de texto en el sensor de la cámara antes de que cualquier preprocesamiento pueda actuar. Ni Tesseract, ni la CNN, ni ningún algoritmo de visión puede recuperar información que nunca fue capturada.
+
+El aspecto positivo es que el sistema \textbf{falla de manera segura}: no produce recomendaciones incorrectas basadas en texto mal leído, sino que devuelve campos vacíos y guía al usuario para que ingrese el dato correcto. La verificación humana funciona como mecanismo de mitigación efectivo: el flujo completo puede recuperarse con un solo dato manual del usuario (el principio activo), y el resto del pipeline (KNN, LLM) opera correctamente a partir de ese punto.
+
+La mejora para este caso implicaría incorporar detección automática de reflexión en la imagen y solicitar una nueva captura antes de ejecutar el OCR, en lugar de intentar procesar una imagen irrecuperable.
 
 \pagebreak
