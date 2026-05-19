@@ -1,0 +1,38 @@
+# API
+fastapi==0.111.0
+uvicorn==0.30.0
+python-multipart==0.0.9
+pydantic==2.7.0
+pydantic-settings==2.3.0
+python-dotenv==1.0.1
+
+# LLM
+anthropic==0.28.0
+
+# Embeddings / Vector DB
+chromadb==0.6.3
+sentence-transformers==3.0.1
+
+# CNN (opcional — si falla la instalación, el servidor igual funciona sin CNN)
+torch>=2.5.0
+torchvision>=0.20.0
+pillow>=10.0.0
+
+# KNN / ML
+scikit-learn==1.5.0
+numpy>=1.26.4
+pandas==2.2.2
+joblib==1.4.2
+
+# OCR
+pytesseract==0.3.10
+opencv-python-headless>=4.9.0
+
+# Scraping (scripts)
+playwright==1.44.0
+httpx==0.27.0
+rapidfuzz==3.9.0
+tqdm==4.66.4
+
+# Wikipedia para knowledge base
+wikipedia-api==0.6.0

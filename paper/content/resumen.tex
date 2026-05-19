@@ -1,0 +1,23 @@
+\section*{Resumen}
+
+Colombia enfrenta una crisis crítica en el sector salud derivada de la deuda acumulada de aproximadamente 32.9 billones de pesos entre 29 Entidades Promotoras de Salud (EPS), según informes del Ministerio de Salud emitidos en julio de 2025. Esta problemática financiera ha desencadenado graves consecuencias para las Instituciones Prestadoras de Servicios de Salud (IPS), generando desabastecimiento de medicamentos, demoras extensas en la entrega de fármacos y barreras de acceso para pacientes que dependen de tratamientos continuos. La Corte Constitucional ha constatado que persisten dificultades en la entrega de medicamentos por deudas acumuladas, incremento de tutelas y ausencia de información confiable para alertar sobre desabastecimientos.
+
+Ante esta situación, el presente trabajo propone el desarrollo de un prototipo de inteligencia artificial que brinde una solución temporal mientras se implementan reformas estructurales al sistema de salud. La propuesta consiste en un sistema que utiliza \textbf{Reconocimiento Óptico de Caracteres (OCR)} para extraer el nombre del medicamento desde una fotografía (caja o parte trasera del blíster), valida el resultado mediante verificación del usuario y consulta fuentes colombianas para enriquecer la información del producto. Posteriormente, el sistema recomienda \textbf{alternativas farmacéuticas} priorizando equivalencias por \textbf{principio activo principal}, empleando un enfoque de similitud basado en \textbf{K-Nearest Neighbors (KNN)} y reglas de filtrado.
+
+El MVP implementa un pipeline automatizado que, a partir de la imagen del medicamento, obtiene el texto relevante, identifica el fármaco, presenta su \textbf{función} (tipo terapéutico y usos generales) y sugiere alternativas disponibles en el catálogo, priorizando medicamentos con la misma molécula y, de manera secundaria e informativa, opciones de la misma clase terapéutica cuando no existan equivalentes suficientes. Este enfoque busca empoderar a los pacientes con información oportuna mientras se resuelven los problemas estructurales del sistema de salud colombiano, mitigando el impacto de la crisis sobre personas con enfermedades crónicas o tratamientos de alto costo.
+
+\subsection*{Palabras clave}
+Medicamentos, EPS, IPS, OCR, KNN, Búsqueda por similitud, Recomendación, Principio activo, Machine Learning
+
+\section*{Abstract}
+
+Colombia faces a critical crisis in the health sector derived from the accumulated debt of approximately 32.9 trillion pesos among 29 Health Promoting Entities (EPS), according to reports from the Ministry of Health issued in July 2025. This financial problem has triggered severe consequences for Health Service Provider Institutions (IPS), generating medicine shortages, extensive delays in drug delivery, and access barriers for patients who depend on continuous treatments. The Constitutional Court has confirmed that difficulties persist in medicine delivery due to accumulated debts, increased legal actions, and absence of reliable information to alert about shortages.
+
+In response, this work proposes an artificial intelligence MVP that provides a temporary, user-oriented solution while structural reforms are implemented. The proposed system applies \textbf{Optical Character Recognition (OCR)} to extract the medicine name from a photograph (medicine box or the back side of a blister pack), validates the extracted text through user verification, and queries Colombian data sources to enrich the drug profile. It then recommends \textbf{pharmaceutical alternatives} by prioritizing equivalence through the \textbf{main active ingredient}, using a similarity-based ranking strategy with \textbf{K-Nearest Neighbors (KNN)} and filtering rules.
+
+The MVP implements an automated pipeline that extracts relevant text from the image, identifies the drug, displays its \textbf{function} (therapeutic type and general uses), and suggests alternatives available in the catalog, prioritizing same-molecule options and, secondarily (as informational suggestions), same-therapeutic-class alternatives when direct equivalents are not available. This approach aims to empower patients with timely information while mitigating the crisis impact on people with chronic conditions or high-cost treatments.
+
+\subsection*{Key words}
+Medicines, EPS, IPS, OCR, KNN, Similarity search, Recommendation, Active ingredient, Machine Learning
+
+\pagebreak

@@ -1,0 +1,95 @@
+\section{Reflexiones}
+
+% ─── A. LECCIONES APRENDIDAS ──────────────────────────────────────────────────
+
+\subsection{Lecciones aprendidas}
+
+\subsubsection*{Acierto 1: La verificación humana como mitigador estructural de errores del pipeline}
+
+Incluir una etapa de verificación manual entre el OCR y el KNN resultó ser la decisión arquitectónica más importante del proyecto. Al mostrar los campos extraídos de forma editable antes de ejecutar las recomendaciones, el sistema puede operar con un OCR de precisión moderada sin comprometer la calidad de las alternativas entregadas. Los casos de prueba documentados en la sección anterior confirman este diseño: en los casos exitosos (Acetaminofén, Cefalexina, Aspirina, Doxiciclina), el usuario simplemente confirmó los campos prepoblados sin necesidad de corrección; en los casos de falla por ángulo oblicuo (Naproxeno, Omeprazol), el sistema presentó campos vacíos y guió al usuario a ingresar el dato manualmente, permitiendo que el resto del pipeline (KNN, LLM) funcionase correctamente a partir de ese punto.
+
+El aprendizaje es que en aplicaciones de salud donde el costo de un error es alto, diseñar \textit{checkpoints} humanos explícitos en el pipeline es más robusto que intentar eliminar todos los errores del modelo de IA. La verificación humana no es un parche: es parte del diseño que hace al sistema confiable incluso cuando sus componentes individuales fallan.
+
+\subsubsection*{Acierto 2: La estrategia de búsqueda en cascada como solución al problema de mapeo OCR~→~principio activo}
+
+Una de las correcciones más impactantes del proyecto fue la implementación de la función \texttt{buscar\_pa\_por\_nombre} con una cascada de cuatro niveles: (0) verificación directa de cada palabra significativa del texto OCR como principio activo en el catálogo, (1) coincidencia exacta de nombre comercial, (2) contención por la palabra más larga en nombres del catálogo, y (3) \textit{fuzzy matching} con \textit{rapidfuzz}. El nivel 0 resolvió eficientemente los casos donde el empaque incluye el principio activo en su texto visible (Acetaminofén, Cefalexina), mientras que los niveles superiores cubrieron casos con nombres comerciales diferenciados.
+
+Esta solución también requirió identificar y filtrar \textit{stopwords} farmacéuticas genéricas (``medicamento'', ``comprimidos'', ``cápsula'', entre otras) para evitar falsos positivos: en pruebas iniciales, el sistema mapeó la lectura ``medicamento ficticio'' a ``cefalotina'' porque la palabra ``medicamento'' producía coincidencia parcial con entradas del catálogo que contienen la cadena ``GRUPO DE MEDICAMENTOS''. La corrección consistió en excluir estas palabras antes de cualquier búsqueda. El aprendizaje es que el vocabulario del dominio farmacéutico contiene términos de alta frecuencia que, sin filtrado previo, contaminan cualquier estrategia de búsqueda por similitud.
+
+\subsubsection*{Acierto 3: La evaluación de múltiples estrategias OCR como respuesta a la diversidad de empaques farmacéuticos}
+
+El pipeline OCR final evalúa hasta seis variantes de preprocesamiento (umbral suave Otsu, umbral agresivo CLAHE, canal rojo, diferencia de canales R$-$B, entre otros) combinadas con cuatro modos PSM de Tesseract (3, 4, 6, 11), aplicadas sobre una imagen escalada al doble de su resolución original. Adicionalmente, la corrección de orientación evalúa las cuatro rotaciones cardinales (0°, 90°, 180°, 270°) en lugar de depender del detector OSD de Tesseract, que demostró ser poco confiable para empaques con texto en múltiples direcciones.
+
+Este enfoque, aunque más costoso en cómputo, fue validado por los casos de prueba: la imagen de Noxpirin (fondo azul oscuro, texto en múltiples orientaciones) era leída completamente invertida por el detector OSD, mientras que la evaluación por rotaciones cardinales identificó correctamente la orientación de mayor confianza. Los canales de color adicionales mejoraron la lectura de texto amarillo y rojo sobre fondos de color intenso. El aprendizaje es que para visión por computadora sobre empaques del mundo real, probar múltiples estrategias y seleccionar la de mayor confianza es más efectivo que intentar encontrar la estrategia óptima universal.
+
+\subsubsection*{Acierto 4: Priorizar la amplitud del catálogo sobre la sofisticación del modelo}
+
+La decisión de utilizar el catálogo oficial completo del INVIMA (153.523 registros sanitarios) como base de datos del sistema, en lugar de construir un dataset propio reducido, demostró que para un MVP con impacto real la \textbf{calidad y amplitud de los datos supera a la complejidad del modelo}. El algoritmo KNN usado es conceptualmente simple, pero opera sobre un catálogo exhaustivo que cubre cualquier medicamento con registro colombiano vigente. El caso de Cefalexina ilustra esto: el sistema devolvió cinco alternativas farmacéuticamente distintas (tableta, cápsula, polvo para suspensión, gránulos, liberación prolongada) sin ajuste manual, gracias a la riqueza del catálogo.
+
+El aprendizaje es que en sistemas de recomendación orientados a usuarios finales, la cobertura es un prerrequisito más crítico que la precisión del ranking. Un sistema muy preciso sobre 100 medicamentos es menos útil que uno moderadamente preciso sobre 150.000.
+
+\subsubsection*{Error 1: Subestimar la heterogeneidad del catálogo INVIMA}
+
+El catálogo del INVIMA registra el mismo principio activo de formas inconsistentes. ``Cefalexina'' aparece como ``cefalexina'', ``cefalexina base'', ``cefalexina monohidrato'', ``cefalexina monohidrato compactada'', ``cefalexina monohidrato polvo liofilizado equivalente a cefalexina base anhidra'', entre otras variantes. Inicialmente, el sistema trataba estas cadenas como sustancias distintas y devolvía el mismo medicamento varias veces en las recomendaciones. Fue necesario implementar una deduplicación en dos capas: por nombre comercial normalizado y por perfil clínico (concentración numérica + forma farmacéutica), además de restricciones en el patrón de \textit{matching} para la notación ``X equivalente a Y~mg de X base'' del INVIMA.
+
+El caso de prueba de Cefalexina validó que la deduplicación funciona correctamente: de decenas de registros con cefalexina en el catálogo, el sistema devolvió únicamente las cinco presentaciones farmacéuticas genuinamente distintas. El aprendizaje es que los datos gubernamentales del mundo real requieren un análisis exploratorio detallado antes de integrarlos en un sistema de recomendación: la limpieza y normalización de datos representó la mayor fuente de errores visibles para el usuario y la mayor parte del tiempo de corrección del sistema.
+
+\subsubsection*{Error 2: Confundir confianza OCR con éxito de identificación}
+
+La confianza reportada por Tesseract mide la certeza del reconocimiento carácter a carácter, no la corrección semántica del texto extraído ni la capacidad del sistema para mapearlo a un medicamento real. Los casos de falla por ángulo oblicuo (Naproxeno Sódico y Omeprazol) ilustraron esto con claridad: ambos reportaron una confianza OCR del 95\,\%, pero el texto extraído no produjo ninguna coincidencia válida en el catálogo INVIMA porque la perspectiva deformada de la imagen había distorsionado la geometría del texto.
+
+Este hallazgo motivó la incorporación del \textit{match score} de catálogo como segunda métrica de confianza, mostrada en la interfaz junto con la confianza OCR. El aprendizaje es que en pipelines de OCR aplicado a dominios específicos, es necesario validar la calidad del texto extraído contra el conocimiento del dominio (en este caso, el catálogo) y no confiar únicamente en las métricas internas del motor de reconocimiento.
+
+\subsubsection*{Error 3: No contemplar la diferencia entre imagen de galería e imagen de cámara}
+
+Durante el desarrollo inicial, el sistema se probó casi exclusivamente con imágenes subidas desde galería, donde la calidad y las condiciones de captura son controlables. Al integrar la funcionalidad de cámara en tiempo real, surgieron diferencias importantes: las imágenes de cámara tienen variaciones de iluminación, pueden estar desenfocadas, y la resolución depende del dispositivo. Los casos de falla por ángulo oblicuo (Naproxeno y Omeprazol) son representativos del comportamiento real del usuario cuando fotografía un medicamento sin instrucciones de captura explícitas.
+
+El aprendizaje es que en aplicaciones móviles que dependen de visión por computadora, las pruebas deben realizarse desde el inicio con imágenes representativas del canal de entrada real (cámara del dispositivo), no solo con imágenes de referencia de alta calidad. El entorno de captura es parte del sistema, y diseñar guías visuales de encuadre en la interfaz (como las usadas en aplicaciones de escaneo de documentos) hubiera reducido esta categoría de fallas desde el diseño.
+
+\subsubsection*{Error 4: Comportamiento no determinístico del LLM ante fallos de recuperación RAG}
+
+Los casos de prueba revelaron que el módulo LLM presenta dos modos de falla distintos ante una recuperación RAG incorrecta, y no existe garantía de cuál ocurrirá. En el Caso 4 (Doxiciclina), el modelo generó silenciosamente una explicación sobre \textit{doxazosina} sin advertir al usuario, porque la similitud léxica superficial entre ambos términos era suficiente para que el contexto recuperado pareciera plausible. En el Caso 6 (Aspirina), ante una distancia semántica más evidente entre el principio activo solicitado y el contexto recuperado, el mismo modelo detectó la inconsistencia y emitió una advertencia explícita.
+
+Esta variabilidad de comportamiento es problemática en un contexto clínico: el sistema no puede garantizar que los errores del LLM sean detectables por el usuario. El aprendizaje es que en pipelines RAG para aplicaciones críticas, no es suficiente confiar en la capacidad de auto-corrección del modelo; es necesario implementar validaciones explícitas en la capa de recuperación, como un umbral mínimo de similitud coseno que impida invocar al LLM cuando el contexto recuperado no es suficientemente relevante para el principio activo consultado.
+
+% ─── B. CONCLUSIONES Y TRABAJO FUTURO ────────────────────────────────────────
+
+\subsection{Conclusiones y trabajo futuro}
+
+\subsubsection*{Conclusión 1: Viabilidad del pipeline OCR → verificación → KNN para el contexto colombiano}
+
+Los seis casos de prueba documentados en la sección de Evaluación demuestran que el pipeline implementado es viable como herramienta de apoyo en el contexto de la crisis de desabastecimiento de medicamentos en Colombia. En cuatro de los seis casos (Acetaminofén, Cefalexina, Doxiciclina, Aspirina), el sistema identificó correctamente el medicamento a partir de la imagen con confianza OCR del 99\,\% y produjo alternativas con equivalencia por principio activo en tiempo de respuesta inferior a 10 segundos. Las dos fallas documentadas (Naproxeno, Omeprazol) corresponden a condiciones de captura claramente inadecuadas (ángulos oblicuos con mano en el encuadre), y en ambas el sistema respondió de forma segura: presentó campos vacíos y guió al usuario hacia la entrada manual, permitiendo completar el flujo sin pérdida de funcionalidad.
+
+La combinación de OCR con estrategias de preprocesamiento múltiple, búsqueda en cascada contra el catálogo INVIMA completo y verificación humana intermedia demostró ser un diseño \textbf{robusto ante sus propias limitaciones}: cuando algún componente falla, el sistema no produce recomendaciones incorrectas, sino que escala el control al usuario.
+
+\subsubsection*{Conclusión 2: La calidad de las recomendaciones está acotada por la calidad del catálogo}
+
+El sistema de recomendación KNN es tan bueno como los datos sobre los que opera. La heterogeneidad en la nomenclatura de principios activos del catálogo INVIMA ---que refleja la ausencia de un vocabulario controlado en los registros sanitarios colombianos--- limita la precisión de las equivalencias. La deduplicación implementada resuelve el problema de duplicados visibles para el usuario, y los casos de prueba confirman su efectividad (Cefalexina: 5 alternativas únicas genuinamente distintas). Sin embargo, la raíz del problema persiste: el mismo principio activo con múltiples grafías en el catálogo obliga a reglas de normalización específicas que pueden fallar con variantes no contempladas.
+
+Para que un sistema como MediFinder opere a escala con alta confiabilidad, sería necesario un proceso previo de estandarización de principios activos con respaldo farmacológico, por ejemplo basado en el sistema ATC de la OMS, que el catálogo INVIMA ya utiliza parcialmente para la clasificación terapéutica pero no para la nomenclatura de principios activos.
+
+\subsubsection*{Conclusión 3: La CNN como fallback visual es promisoria pero requiere datos representativos}
+
+La integración de EfficientNet-B0 como respaldo visual para los casos en que el OCR falla es una extensión arquitectónica coherente con los trabajos relacionados revisados. En los casos de prueba, el módulo CNN se activó correctamente en las situaciones previstas (falla OCR por ángulo oblicuo). Sin embargo, en ambos casos tampoco logró identificar el medicamento, dado que el espacio de embeddings fue construido con imágenes de referencia frontales y controladas que no representan las condiciones de captura real del usuario.
+
+La CNN actualmente tiene utilidad principalmente para los medicamentos cuyas imágenes frontales formaron parte del conjunto de construcción de embeddings (225 imágenes de referencia scrapeadas de Farmatodo y Cruz Verde). Para que este componente sea un mecanismo de respaldo real a escala nacional, se requeriría un dataset de imágenes de empaques colombianos fotografiados en condiciones de usuario final, lo cual constituye el trabajo de recolección de datos más relevante aún pendiente.
+
+\subsubsection*{Conclusión 4: El módulo LLM requiere un umbral de relevancia RAG antes de generar explicaciones}
+
+Los casos de Doxiciclina y Aspirina evidenciaron que el módulo LLM puede producir explicaciones clínicamente incorrectas cuando la recuperación RAG no encuentra un documento suficientemente representativo del principio activo consultado. La variabilidad de comportamiento observada ---falla silenciosa en un caso, auto-detección en otro--- indica que la confiabilidad del módulo depende tanto de la cobertura de la \textit{knowledge base} como de qué tan evidente sea la discrepancia semántica para el modelo.
+
+En la versión actual, la \textit{knowledge base} cubre 11.217 documentos de principios activos construidos a partir de los CSV del INVIMA y Wikipedia, pero su cobertura es irregular: los antibióticos y medicamentos menos comunes tienen representación escasa o nula, lo que expone al sistema a recuperaciones incorrectas. La conclusión es que el módulo LLM no puede considerarse confiable sin un mecanismo de validación en la capa de recuperación que garantice que el contexto entregado al modelo corresponde al principio activo consultado.
+
+\subsubsection*{Trabajo futuro}
+
+Las mejoras prioritarias identificadas a partir de los resultados de evaluación son las siguientes, ordenadas por impacto potencial:
+
+\textbf{Detección de calidad de imagen previa al OCR.} Los casos de falla por ángulo oblicuo (Naproxeno, Omeprazol) sugieren incorporar una etapa de evaluación de calidad antes de ejecutar el pipeline: estimación del ángulo de inclinación del empaque, detección de objetos en el encuadre (manos, fondos de color) y porcentaje de área útil. Si la imagen no supera umbrales mínimos, el sistema solicitaría una nueva captura antes de procesar, evitando el ciclo innecesario OCR → CNN → falla → campos vacíos.
+
+\textbf{Umbral mínimo de similitud en la recuperación RAG.} Para resolver los fallos del módulo LLM documentados en los Casos 4 y 6, se debe implementar un umbral de similitud coseno mínimo en la recuperación de contexto: si el documento más cercano en la \textit{knowledge base} no supera ese umbral, el sistema informaría al usuario que no dispone de información verificada sobre ese principio activo en lugar de generar una explicación potencialmente incorrecta.
+
+\textbf{Ampliación del dataset de imágenes CNN.} Para que el módulo visual sea un respaldo real, se requiere un conjunto de imágenes de empaques colombianos fotografiados en condiciones reales de usuario (ángulos variados, iluminación heterogénea, diferentes dispositivos). El proceso de \textit{web scraping} implementado sobre Farmatodo y Cruz Verde provee una base de partida; escalarlo a más fuentes y complementarlo con capturas de usuarios voluntarios aumentaría significativamente la cobertura y la robustez del fallback CNN.
+
+\textbf{Integración de disponibilidad geográfica en tiempo real.} La mejora con mayor impacto para el usuario final sería integrar la API de \textit{Medicamentos a un Clic} del Ministerio de Salud y Protección Social para incorporar disponibilidad por municipio o departamento. Actualmente, MediFinder indica \textit{qué} medicamentos son equivalentes, pero no \textit{dónde} conseguirlos. Enlazar cada alternativa recomendada con datos de disponibilidad regional transformaría el sistema de una herramienta informativa a una herramienta operativa, que es lo que el paciente realmente necesita durante la crisis de desabastecimiento.
+
+\pagebreak

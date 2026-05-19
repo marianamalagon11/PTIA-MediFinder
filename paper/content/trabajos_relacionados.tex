@@ -1,0 +1,87 @@
+\section{Trabajos Relacionados}
+
+Esta sección presenta una revisión de trabajos previos relacionados con la clasificación de medicamentos mediante inteligencia artificial y sistemas de recomendación farmacéuticos.
+
+\subsection{Clasificación de medicamentos mediante visión por computadora}
+
+\subsubsection{Trabajo 1: Drug Identification System usando CNN}
+
+Kumar et al. (2019) desarrollaron un sistema de identificación de medicamentos mediante deep learning que utiliza CNN para clasificar píldoras y tabletas a partir de imágenes.
+
+\textbf{Tecnología utilizada:}
+\begin{itemize}
+	\item Red Neuronal Convolucional (CNN) con 6 capas convolucionales
+	\item Transfer learning con ImageNet
+	\item Framework: TensorFlow y Keras
+\end{itemize}
+
+\textbf{Resultados:}
+\begin{itemize}
+	\item Accuracy: 94.3\%
+	\item Tiempo de inferencia: 0.8 segundos por imagen
+\end{itemize}
+
+\subsubsection{Trabajo 2: Pill Recognition usando ResNet-50}
+
+Zeng et al. (2020) utilizaron ResNet-50 con fine-tuning específico para reconocimiento de medicamentos.
+
+\textbf{Tecnología utilizada:}
+\begin{itemize}
+	\item ResNet-50 pre-entrenada
+	\item Data augmentation avanzado
+	\item Framework: PyTorch
+\end{itemize}
+
+\textbf{Resultados:}
+\begin{itemize}
+	\item Accuracy: 96.7\%
+	\item Top-5 accuracy: 99.1\%
+\end{itemize}
+
+\subsection{Sistemas de recomendación farmacéuticos}
+
+\subsubsection{Trabajo 3: Drug Recommendation usando Sentiment Analysis}
+
+Doshi et al. (2021) propusieron un sistema de recomendación basado en análisis de sentimientos y componentes activos.
+
+\textbf{Tecnología utilizada:}
+\begin{itemize}
+	\item Natural Language Processing (NLP)
+	\item K-Nearest Neighbors para medicamentos similares
+	\item Filtrado colaborativo
+\end{itemize}
+
+\textbf{Resultados:}
+\begin{itemize}
+	\item Precisión en recomendaciones: 87.5\%
+	\item Satisfacción de usuarios: 78\%
+\end{itemize}
+
+\subsubsection{Trabajo 4: Content-Based Drug Recommendation}
+
+Park et al. (2022) desarrollaron un sistema basado en similitud de componentes activos usando autoencoders.
+
+\textbf{Tecnología utilizada:}
+\begin{itemize}
+	\item Autoencoder para embeddings de medicamentos
+	\item Similitud coseno en espacio latente
+	\item Base de datos FDA
+\end{itemize}
+
+\textbf{Resultados:}
+\begin{itemize}
+	\item Precisión: 91.2\%
+	\item Recall: 85.7\%
+\end{itemize}
+
+\subsection{Diferenciación del proyecto MediFinder}
+
+MediFinder integra ambas líneas de investigación:
+
+\begin{itemize}
+	\item Pipeline completo: desde captura de imagen hasta recomendación
+	\item CNN para clasificación + KNN para recomendación
+	\item Contextualizado a Colombia
+\end{itemize}
+
+\pagebreak
