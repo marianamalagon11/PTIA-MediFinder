@@ -1,7 +1,18 @@
 \babel@toc {spanish}{}\relax 
-\contentsline {figure}{\numberline {1}{\ignorespaces Detalle del gasto en salud por categorías 2021-2025}}{14}{figure.caption.1}%
-\contentsline {figure}{\numberline {2}{\ignorespaces Evolución del gasto privado en medicamentos en Colombia 2021-2025}}{14}{figure.caption.2}%
-\contentsline {figure}{\numberline {3}{\ignorespaces Prototipo de papel (wireframe) del MVP de MediFinder: captura/subida, extracción y verificación (OCR) y resultados con función del medicamento y alternativas (KNN por principio activo).}}{21}{figure.caption.3}%
-\contentsline {figure}{\numberline {4}{\ignorespaces Pantalla 1 del prototipo de interfaz de MediFinder.}}{22}{figure.caption.4}%
-\contentsline {figure}{\numberline {5}{\ignorespaces Pantalla 2 del prototipo de interfaz de MediFinder.}}{23}{figure.caption.5}%
-\contentsline {figure}{\numberline {6}{\ignorespaces Pantalla 3 del prototipo de interfaz de MediFinder.}}{24}{figure.caption.6}%
+\contentsline {figure}{\numberline {1}{\ignorespaces Detalle del gasto en salud por categorías 2021-2025}}{15}{figure.caption.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Evolución del gasto privado en medicamentos en Colombia 2021-2025}}{15}{figure.caption.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Prototipo de papel (wireframe) del MVP de MediFinder: captura/subida, extracción y verificación (OCR) y resultados con función del medicamento y alternativas (KNN por principio activo).}}{22}{figure.caption.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Pantalla 1 del prototipo de interfaz de MediFinder.}}{23}{figure.caption.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Pantalla 2 del prototipo de interfaz de MediFinder.}}{24}{figure.caption.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces Pantalla 3 del prototipo de interfaz de MediFinder.}}{25}{figure.caption.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Falla de identificación para Naproxeno Sódico 275 mg. El ángulo oblicuo de captura y la presencia de la mano en el encuadre impiden tanto el OCR como la búsqueda visual CNN. El sistema presenta campos vacíos y guía al usuario hacia la entrada manual.}}{32}{figure.caption.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Falla de identificación para Omeprazol con caja sostenida lateralmente. La orientación de la imagen expone la cara lateral del empaque en lugar de la frontal, impidiendo tanto el OCR como la búsqueda visual CNN.}}{34}{figure.caption.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Pantalla de verificación para Acetaminofén 500 mg. OCR con 99\,\% de confianza y \textit {match} de catálogo al 99\,\%.}}{36}{figure.caption.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Pantalla de resultados: medicamento identificado, 1 alternativa encontrada con similitud 100\,\% y sección expandible de información del principio activo.}}{37}{figure.caption.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Explicación del principio activo paracetamol (acetaminofén) generada por Claude Haiku con RAG, presentada en seis secciones clínicas estructuradas y contextualizadas para el paciente colombiano.}}{38}{figure.caption.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Pantalla de verificación para Doxiciclina 100 mg. OCR y \textit {match} de catálogo al 99\,\%, campos prepoblados correctamente sin intervención del usuario.}}{40}{figure.caption.12}%
+\contentsline {figure}{\numberline {13}{\ignorespaces Pantalla de resultados para Doxiciclina 100 mg. El KNN identifica correctamente 1 alternativa con similitud 100\,\%; sin embargo, la sección de información del principio activo muestra una explicación sobre \textit {doxazosina} en lugar de \textit {doxiciclina}, evidenciando una falla en la recuperación RAG por similitud léxica espuria.}}{41}{figure.caption.13}%
+\contentsline {figure}{\numberline {14}{\ignorespaces Pantalla de verificación para Cefalexina 500 mg. OCR y \textit {match} de catálogo al 99\,\%, con registro INVIMA M-006738-R1.}}{43}{figure.caption.14}%
+\contentsline {figure}{\numberline {15}{\ignorespaces Pantalla de resultados para Cefalexina 500 mg. Cinco alternativas únicas de nivel 1 con similitud 100\,\%, diferenciadas por forma farmacéutica y titular.}}{44}{figure.caption.15}%
+\contentsline {figure}{\numberline {16}{\ignorespaces Pantalla de verificación para Aspirina 500 mg. OCR y \textit {match} de catálogo al 99\,\%, con identificación correcta del principio activo ácido acetilsalicílico.}}{46}{figure.caption.16}%
+\contentsline {figure}{\numberline {17}{\ignorespaces Pantalla de resultados para Aspirina 500 mg. El LLM detecta y reporta activamente la confusión semántica en la recuperación RAG, a diferencia del Caso 4 donde la explicación incorrecta se presentó sin advertencia.}}{47}{figure.caption.17}%
