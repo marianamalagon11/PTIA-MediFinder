@@ -24,7 +24,7 @@ El usuario fotografía la caja de NAPROXENO SÓDICO 275 MG (MK) sosteniéndola c
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.82\textwidth]{img/eval_napro_falla.png}
+    \includegraphics[width=0.82\textwidth]{img/eval_napro_falla.jpeg}
     \caption{Falla de identificación para Naproxeno Sódico 275 mg. El ángulo oblicuo de captura y la presencia de la mano en el encuadre impiden tanto el OCR como la búsqueda visual CNN. El sistema presenta campos vacíos y guía al usuario hacia la entrada manual.}
     \label{fig:eval_napro_falla}
 \end{figure}
@@ -53,7 +53,7 @@ El usuario fotografía una caja de OMEPRAZOL (La Santé) sosteniéndola vertical
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.82\textwidth]{img/eval_omep_falla.png}
+    \includegraphics[width=0.82\textwidth]{img/eval_omep_falla.jpeg}
     \caption{Falla de identificación para Omeprazol con caja sostenida lateralmente. La orientación de la imagen expone la cara lateral del empaque en lugar de la frontal, impidiendo tanto el OCR como la búsqueda visual CNN.}
     \label{fig:eval_omep_falla}
 \end{figure}
@@ -109,7 +109,9 @@ El usuario fotografía la cara frontal de una caja de ACETAMINOFÉN 500 MG TABLE
 
         \item \textbf{Salida final:} pantalla de resultados con el medicamento identificado, 1 alternativa única con badge \textit{``Mismo principio activo''} y \textit{``Similitud 100\,\%''}, información del titular INVIMA, y explicación completa del principio activo expandible en pantalla (Imágenes~\ref{fig:eval_aceta_verificacion}, \ref{fig:eval_aceta_resultados} y \ref{fig:eval_aceta_llm}).
 
-\textbf{Resultado logrado.}
+    \end{enumerate}
+
+    \textbf{Resultado logrado.}
 El sistema identificó el medicamento con la mayor confianza registrada en las pruebas (99\,\% OCR, 99\,\% catálogo), sin intervención del usuario. El paso 0 de la cascada de búsqueda --- verificación directa de cada palabra OCR como principio activo en el catálogo --- resultó determinante: la palabra \texttt{"acetaminofen"} presente en el empaque es simultáneamente el nombre comercial y el principio activo, lo que eliminó la necesidad de búsqueda por nombre comercial o \textit{fuzzy matching}. La corrección automática de rotación por evaluación de las cuatro orientaciones cardinales garantizó que el texto del empaque de fondo azul multicolor fuera leído en la orientación correcta, a diferencia de pruebas anteriores donde la heurística OSD producía lecturas invertidas. La explicación LLM, respaldada por RAG sobre la base de conocimiento, entregó información clínicamente estructurada y contextualizada para el mercado colombiano.
 
 \subsubsection*{Caso 2: Doxiciclina 100 mg --- fotografía de caja, fallo parcial del módulo LLM por confusión semántica en RAG}
