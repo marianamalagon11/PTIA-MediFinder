@@ -16,7 +16,7 @@ MediFinder resuelve esto en tres pasos: **foto → identificación → alternati
 
 ## Demo del flujo
 
-[🎬 Video Funcional]([https://ejemplo.com](https://youtu.be/m80PA7jCPk4))
+[🎬 Video Funcional](https://youtu.be/m80PA7jCPk4)
 
 ```
 📷 Usuario fotografía el empaque
