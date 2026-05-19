@@ -94,6 +94,60 @@ function AlternativaCard({ alt, index }) {
   );
 }
 
+const SECCIONES = ['Qué es', 'Cómo actúa', 'Efectos secundarios', 'Contraindicaciones', 'Interacciones', 'Recomendaciones'];
+const PATRON_SECCION = new RegExp(`(${SECCIONES.join('|')}):`, 'i');
+
+function ExplicacionTexto({ texto }) {
+  if (!texto) return null;
+
+  // Partir el texto en bloques usando los encabezados conocidos
+  const partes = texto.split(/\n(?=[A-ZÁÉÍÓÚ][^:]{2,30}:)/);
+
+  const bloques = partes.map(parte => {
+    const colonIdx = parte.indexOf(':');
+    if (colonIdx > 0 && colonIdx < 40) {
+      const titulo  = parte.slice(0, colonIdx).trim();
+      const cuerpo  = parte.slice(colonIdx + 1).trim();
+      if (PATRON_SECCION.test(titulo + ':')) {
+        return { titulo, cuerpo };
+      }
+    }
+    return { titulo: null, cuerpo: parte.trim() };
+  }).filter(b => b.cuerpo);
+
+  // Si no se detectaron secciones, mostrar texto limpio sin markdown
+  if (!bloques.some(b => b.titulo)) {
+    const limpio = texto
+      .replace(/^#+\s*/gm, '')
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/---+/g, '')
+      .trim();
+    return (
+      <p style={{ marginTop: 16, fontSize: 15, color: '#374151', lineHeight: 1.75 }}>
+        {limpio}
+      </p>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {bloques.map((b, i) => (
+        <div key={i}>
+          {b.titulo && (
+            <p style={{ fontSize: 13, fontWeight: 600, color: '#155DFC', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {b.titulo}
+            </p>
+          )}
+          <p style={{ fontSize: 15, color: '#374151', lineHeight: 1.7 }}>
+            {b.cuerpo}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ExplicacionSection({ explicacion }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -137,15 +191,7 @@ function ExplicacionSection({ explicacion }) {
 
       {expanded && (
         <div style={{ padding: '0 24px 24px', borderTop: '1px solid #F3F4F6' }}>
-          <div style={{
-            marginTop: 16,
-            fontSize: 15,
-            color: '#374151',
-            lineHeight: 1.75,
-            whiteSpace: 'pre-wrap',
-          }}>
-            {explicacion.explicacion}
-          </div>
+          <ExplicacionTexto texto={explicacion.explicacion} />
         </div>
       )}
 

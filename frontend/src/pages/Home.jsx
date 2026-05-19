@@ -198,11 +198,11 @@ export default function Home() {
           imagenUrl,
           ocrResult,
           prefilledFields: {
-            nombreComercial:  ocrResult.nombre_detectado || '',
-            principioActivo:  '',
-            concentracion:    extraerConcentracion(ocrResult.texto_completo || ''),
+            nombreComercial:   ocrResult.nombre_detectado || '',
+            principioActivo:   ocrResult.principio_activo || '',
+            concentracion:     extraerConcentracion(ocrResult.texto_completo || ''),
             formaFarmaceutica: extraerForma(ocrResult.texto_completo || ''),
-            registroInvima:   extraerInvima(ocrResult.texto_completo || ''),
+            registroInvima:    extraerInvima(ocrResult.texto_completo || ''),
           },
         },
       });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import LoadingOverlay from '../components/LoadingOverlay';
@@ -25,17 +25,32 @@ const CheckIcon = () => (
   </svg>
 );
 
+function Badge({ children, color = 'green' }) {
+  const palettes = {
+    green: { bg: '#DCFCE7', text: '#008236' },
+    blue:  { bg: '#DBEAFE', text: '#1E40AF' },
+    amber: { bg: '#FFFBEB', text: '#7B3306' },
+  };
+  const { bg, text } = palettes[color] || palettes.green;
+  return (
+    <div style={{
+      display: 'inline-flex', alignItems: 'center', gap: 4,
+      background: bg, color: text,
+      padding: '4px 10px', borderRadius: 20,
+      fontSize: 13, fontWeight: 500, whiteSpace: 'nowrap',
+    }}>
+      {children}
+    </div>
+  );
+}
+
 function FieldRow({ label, value, onChange, placeholder = '' }) {
   const [editing, setEditing] = useState(false);
 
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '14px 0',
-      borderBottom: '1px solid #F3F4F6',
-      gap: 12,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '14px 0', borderBottom: '1px solid #F3F4F6', gap: 12,
     }}>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 500, color: '#4A5565', marginBottom: 4 }}>{label}</p>
@@ -52,11 +67,8 @@ function FieldRow({ label, value, onChange, placeholder = '' }) {
           />
         ) : (
           <p style={{
-            fontSize: 16,
-            color: value ? '#1E2939' : '#99A1AF',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: 16, color: value ? '#1E2939' : '#99A1AF',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {value || placeholder}
           </p>
@@ -65,18 +77,10 @@ function FieldRow({ label, value, onChange, placeholder = '' }) {
       <button
         onClick={() => setEditing(e => !e)}
         style={{
-          flexShrink: 0,
-          width: 36,
-          height: 36,
-          borderRadius: 8,
-          border: '1.5px solid #E5E7EB',
-          background: '#FFFFFF',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#6A7282',
-          transition: 'background 0.15s',
+          flexShrink: 0, width: 36, height: 36, borderRadius: 8,
+          border: '1.5px solid #E5E7EB', background: '#FFFFFF',
+          cursor: 'pointer', display: 'flex', alignItems: 'center',
+          justifyContent: 'center', color: '#6A7282', transition: 'background 0.15s',
         }}
         onMouseEnter={e => e.currentTarget.style.background = '#F9FAFB'}
         onMouseLeave={e => e.currentTarget.style.background = '#FFFFFF'}
@@ -90,20 +94,44 @@ function FieldRow({ label, value, onChange, placeholder = '' }) {
 
 export default function Verification() {
   const { state } = useLocation();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   const { imagenUrl, ocrResult, prefilledFields } = state || {};
 
   const [fields, setFields] = useState({
-    nombreComercial: prefilledFields?.nombreComercial || '',
-    principioActivo: prefilledFields?.principioActivo || '',
-    concentracion:   prefilledFields?.concentracion   || '',
+    nombreComercial:   prefilledFields?.nombreComercial   || '',
+    principioActivo:   prefilledFields?.principioActivo   || '',
+    concentracion:     prefilledFields?.concentracion     || '',
     formaFarmaceutica: prefilledFields?.formaFarmaceutica || '',
-    registroInvima:  prefilledFields?.registroInvima  || '',
+    registroInvima:    prefilledFields?.registroInvima    || '',
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [preview, setPreview]   = useState(null);
+
+  // Pre-fetch alternativas en cuanto tengamos principio activo
+  useEffect(() => {
+    const pa = fields.principioActivo.trim();
+    if (!pa) return;
+    let cancelled = false;
+    Promise.all([
+      buscarAlternativas(pa, fields.concentracion, fields.formaFarmaceutica),
+      explicarCompuesto(pa),
+    ]).then(([alts, exp]) => {
+      if (cancelled) return;
+      const first = alts[0] || {};
+      setPreview({
+        count:       alts.length,
+        titular:     first.titular          || '',
+        clase:       first.clase_terapeutica || '',
+        via:         first.via_administracion || '',
+        alternativas: alts,
+        explicacion:  exp,
+      });
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [fields.principioActivo]);
 
   function setField(key) {
     return (val) => setFields(f => ({ ...f, [key]: val }));
@@ -117,10 +145,12 @@ export default function Verification() {
     setError('');
     setLoading(true);
     try {
-      const [alternativas, explicacion] = await Promise.all([
-        buscarAlternativas(fields.principioActivo, fields.concentracion, fields.formaFarmaceutica),
-        explicarCompuesto(fields.principioActivo),
-      ]);
+      const [alternativas, explicacion] = preview
+        ? [preview.alternativas, preview.explicacion]
+        : await Promise.all([
+            buscarAlternativas(fields.principioActivo, fields.concentracion, fields.formaFarmaceutica),
+            explicarCompuesto(fields.principioActivo),
+          ]);
       navigate('/resultados', {
         state: { imagenUrl, fields, alternativas, explicacion, ocrResult },
       });
@@ -136,12 +166,15 @@ export default function Verification() {
     return null;
   }
 
+  const confianza   = ocrResult?.confianza   ?? 0;
+  const matchScore  = ocrResult?.match_score ?? null;
+  const ocr_exitoso = ocrResult?.ocr_exitoso ?? false;
+
   return (
     <div style={{
       minHeight: '100vh',
       background: 'linear-gradient(180deg, #EFF6FF 0%, #FFFFFF 50%, #F0FDF4 100%)',
-      display: 'flex',
-      flexDirection: 'column',
+      display: 'flex', flexDirection: 'column',
     }}>
       {loading && <LoadingOverlay message="Buscando alternativas y generando explicación..." />}
       <Header showBack />
@@ -149,7 +182,7 @@ export default function Verification() {
       <main style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '40px 32px' }}>
         <div style={{ maxWidth: 768, width: '100%', display: 'flex', flexDirection: 'column', gap: 28 }}>
 
-          {/* Section heading */}
+          {/* Heading */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <h1 style={{ fontSize: 24, fontWeight: 500, color: '#1E2939' }}>
               Verifica el medicamento
@@ -157,58 +190,47 @@ export default function Verification() {
             <p style={{ fontSize: 18, color: '#4A5565' }}>
               Revisa que la información extraída sea correcta
             </p>
+
+            {/* Badges row */}
             {ocrResult && (
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                background: ocrResult.ocr_exitoso ? '#DCFCE7' : '#FFFBEB',
-                color: ocrResult.ocr_exitoso ? '#008236' : '#7B3306',
-                padding: '4px 12px',
-                borderRadius: 20,
-                fontSize: 13,
-                fontWeight: 500,
-                width: 'fit-content',
-              }}>
-                {ocrResult.ocr_exitoso ? '✓' : '⚠️'}&nbsp;
-                {ocrResult.ocr_exitoso
-                  ? `OCR exitoso — confianza ${ocrResult.confianza}%`
-                  : `Confianza baja (${ocrResult.confianza}%) — revisa los campos`}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
+                {ocr_exitoso && (
+                  <Badge color="green">Identificado por OCR</Badge>
+                )}
+                {ocr_exitoso && (
+                  <Badge color="green">Confianza OCR: {Math.round(confianza)}%</Badge>
+                )}
+                {!ocr_exitoso && (
+                  <Badge color="amber">Confianza baja ({Math.round(confianza)}%) — revisa los campos</Badge>
+                )}
+                {matchScore != null && (
+                  <Badge color="blue">Match catálogo: {Math.round(matchScore)}%</Badge>
+                )}
               </div>
             )}
           </div>
 
           {/* Main panel */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 20,
-            background: '#FFFFFF',
-            borderRadius: 16,
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20,
+            background: '#FFFFFF', borderRadius: 16,
             boxShadow: '0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06)',
             overflow: 'hidden',
           }}>
-            {/* Image preview */}
+            {/* Image + drug info */}
             <div style={{
               background: 'linear-gradient(135deg, #F3F4F6 0%, #F9FAFB 100%)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 12,
-              padding: 32,
-              minHeight: 400,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              gap: 12, padding: 32, minHeight: 400,
             }}>
               {imagenUrl ? (
                 <img
                   src={imagenUrl}
                   alt="Imagen capturada"
                   style={{
-                    maxWidth: '100%',
-                    maxHeight: 280,
-                    objectFit: 'contain',
-                    borderRadius: 12,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                    maxWidth: '100%', maxHeight: 220, objectFit: 'contain',
+                    borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
                   }}
                 />
               ) : (
@@ -216,6 +238,27 @@ export default function Verification() {
                   <ImageIcon />
                   <p style={{ fontSize: 16, color: '#6A7282' }}>Imagen capturada</p>
                 </>
+              )}
+
+              {/* Titular / Clase / Vía */}
+              {preview && (preview.titular || preview.clase || preview.via) && (
+                <div style={{ width: '100%', marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {preview.titular && (
+                    <p style={{ fontSize: 13, color: '#374151' }}>
+                      <strong>Titular:</strong> {preview.titular}
+                    </p>
+                  )}
+                  {preview.clase && (
+                    <p style={{ fontSize: 13, color: '#1D4ED8' }}>
+                      <strong>Clase:</strong> {preview.clase}
+                    </p>
+                  )}
+                  {preview.via && (
+                    <p style={{ fontSize: 13, color: '#1D4ED8' }}>
+                      <strong>Vía:</strong> {preview.via}
+                    </p>
+                  )}
+                </div>
               )}
             </div>
 
@@ -254,6 +297,17 @@ export default function Verification() {
             </div>
           </div>
 
+          {/* Preview de alternativas */}
+          {preview && (
+            <div style={{
+              fontSize: 14, color: '#155DFC', lineHeight: 1.5,
+            }}>
+              Se encontraron {preview.count} alternativa{preview.count !== 1 ? 's' : ''}.
+              {' '}Explicación del principio activo lista.
+              {' '}Confirma los datos para ver los resultados.
+            </div>
+          )}
+
           {/* Error */}
           {error && (
             <div className="error-banner">
@@ -277,6 +331,7 @@ export default function Verification() {
               Asegúrate de que la información sea correcta antes de continuar
             </p>
           </div>
+
         </div>
       </main>
     </div>

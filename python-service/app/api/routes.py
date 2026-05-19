@@ -9,6 +9,7 @@ from app.config import settings
 from app.ml import (
     buscar_alternativas,
     buscar_pa_por_nombre,
+    buscar_por_nombre,
     buscar_similares_visual,
     explicar_compuesto,
     extraer_texto_imagen,
@@ -23,6 +24,9 @@ class OCRResult(BaseModel):
     nombre_normalizado: Optional[str]
     confianza: float
     ocr_exitoso: bool
+    principio_activo: Optional[str] = None
+    metodo: Optional[str] = None
+    match_score: Optional[float] = None
 
 
 class CandidatoVisual(BaseModel):
@@ -40,6 +44,10 @@ class Alternativa(BaseModel):
     laboratorio: Optional[str] = None
     nivel: int
     tipo: str
+    clase_terapeutica: Optional[str] = None
+    titular: Optional[str] = None
+    via_administracion: Optional[str] = None
+    similitud: Optional[float] = None
 
 
 class ExplicacionCompuesto(BaseModel):
@@ -72,6 +80,20 @@ async def endpoint_ocr(imagen: UploadFile = File(...)):
 
     if "error" in resultado:
         raise HTTPException(status_code=422, detail=resultado["error"])
+
+    # Si el OCR tuvo éxito, buscar el principio activo en el catálogo INVIMA
+    if resultado.get("ocr_exitoso") and resultado.get("nombre_normalizado"):
+        try:
+            med = buscar_por_nombre(resultado["nombre_normalizado"], umbral=70)
+            if med:
+                resultado["principio_activo"] = med.get("principio_activo") or None
+                resultado["match_score"]      = med.get("score_match")
+                resultado["metodo"]           = "ocr"
+        except Exception:
+            pass
+
+    if not resultado.get("metodo"):
+        resultado["metodo"] = "ocr"
 
     return OCRResult(**resultado)
 

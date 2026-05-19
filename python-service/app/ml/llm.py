@@ -9,31 +9,30 @@ from sentence_transformers import SentenceTransformer
 from app.config import settings
 
 
-
-_embedder: SentenceTransformer | None = None
+_embedder = None
 _kb_collection = None
-_claude: anthropic.Anthropic | None = None
+_claude = None
 
 _COLLECTION_NAME = "compuestos_kb"
-_EMBED_MODEL     = "paraphrase-multilingual-MiniLM-L12-v2" 
+_EMBED_MODEL = "paraphrase-multilingual-MiniLM-L12-v2"
 
 
 def _inicializar():
     global _embedder, _kb_collection, _claude
 
     if _embedder is None:
-        print("[LLM] Cargando modelo de embeddings de texto...")
+        print("[LLM] Cargando modelo de embeddings...")
         _embedder = SentenceTransformer(_EMBED_MODEL)
 
     if _kb_collection is None:
         db_path = Path(settings.embeddings_dir)
         db_path.mkdir(parents=True, exist_ok=True)
-        client       = chromadb.PersistentClient(path=str(db_path))
+        client = chromadb.PersistentClient(path=str(db_path))
         _kb_collection = client.get_or_create_collection(
             name=_COLLECTION_NAME,
             metadata={"hnsw:space": "cosine"},
         )
-        print(f"[LLM] Knowledge base cargada. {_kb_collection.count()} documentos.")
+        print(f"[LLM] Knowledge base lista. {_kb_collection.count()} documentos.")
 
     if _claude is None:
         if not settings.anthropic_api_key:
@@ -41,9 +40,7 @@ def _inicializar():
         _claude = anthropic.Anthropic(api_key=settings.anthropic_api_key)
 
 
-
-def _recuperar_contexto(principio_activo: str, n_chunks: int = 4) -> str:
-    """Busca los chunks más relevantes sobre el principio activo en ChromaDB."""
+def _recuperar_contexto(principio_activo, n_chunks=4):
     _inicializar()
 
     if _kb_collection.count() == 0:
@@ -60,51 +57,30 @@ def _recuperar_contexto(principio_activo: str, n_chunks: int = 4) -> str:
     return "\n\n".join(chunks) if chunks else ""
 
 
+# prompt del sistema — le pedimos que use secciones simples y nada de markdown
+_SYSTEM_PROMPT = """Eres un asistente farmacéutico educativo para pacientes colombianos.
+Explica principios activos en español, de forma clara y breve.
 
-_SYSTEM_PROMPT = """Eres un asistente farmacéutico educativo para el sistema MediFinder, 
-orientado a pacientes colombianos. Tu rol es explicar de manera clara, precisa y en español 
-la información sobre principios activos de medicamentos.
-
-Siempre incluye estas secciones en tu respuesta:
-1. ¿Qué es? (descripción del compuesto y para qué sirve)
-2. Composición / mecanismo de acción (breve, en términos entendibles)
-3. Efectos secundarios más comunes
-4. Contraindicaciones importantes
-5. Advertencias de interacciones (qué NO combinar)
-6. Recomendaciones generales al paciente
-
-Usa un tono claro y empático. NO des diagnósticos ni reemplaces la consulta médica. 
-Termina siempre recordando que deben consultar a su médico o farmacéutico."""
+Usa solo estos encabezados seguidos de dos puntos: "Qué es:", "Cómo actúa:", "Efectos secundarios:", "Contraindicaciones:", "Interacciones:", "Recomendaciones:".
+Escribe en texto plano. No uses #, **, *, ---, emojis ni ningún símbolo de markdown.
+Cada sección máximo 2 oraciones. Sin listas. Tono directo y útil."""
 
 
-def explicar_compuesto(principio_activo: str) -> dict:
-    """
-    Genera una explicación completa del principio activo usando RAG + Claude API.
-
-    Retorna:
-    {
-        "principio_activo": str,
-        "explicacion": str,
-        "fuente_kb": bool,   # True si se encontró info en la knowledge base
-    }
-    """
+def explicar_compuesto(principio_activo):
     _inicializar()
 
-    contexto  = _recuperar_contexto(principio_activo)
+    contexto = _recuperar_contexto(principio_activo)
     fuente_kb = bool(contexto)
 
     if contexto:
         user_msg = (
-            f"Basándote en la siguiente información de nuestra base de conocimiento, "
-            f"explica el principio activo '{principio_activo}' para un paciente colombiano:\n\n"
-            f"--- Información disponible ---\n{contexto}\n---\n\n"
-            f"Sigue el formato de las secciones indicadas."
+            f"Explica '{principio_activo}' usando esta información:\n\n"
+            f"{contexto}\n\nUsa el formato de secciones. Texto plano."
         )
     else:
         user_msg = (
-            f"Explica el principio activo '{principio_activo}' para un paciente colombiano. "
-            f"Sigue el formato de las secciones indicadas. "
-            f"Nota: usa tu conocimiento general ya que no tenemos información específica en nuestra base."
+            f"Explica '{principio_activo}' para un paciente colombiano. "
+            f"Usa el formato de secciones. Texto plano."
         )
 
     try:
@@ -116,10 +92,10 @@ def explicar_compuesto(principio_activo: str) -> dict:
         )
         explicacion = response.content[0].text
     except anthropic.APIError as e:
-        explicacion = f"Error al consultar el modelo de lenguaje: {e}"
+        explicacion = f"Error al consultar el modelo: {e}"
 
     return {
         "principio_activo": principio_activo,
-        "explicacion":      explicacion,
-        "fuente_kb":        fuente_kb,
+        "explicacion": explicacion,
+        "fuente_kb": fuente_kb,
     }
